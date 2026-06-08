@@ -56,7 +56,7 @@ export default function EditTask() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.2 }}
-      className="px-5 pb-12 pt-6 safe-top"
+      className="px-5 pt-screen pb-screen"
     >
       <div className="flex items-center justify-between">
         <h1 className="font-display text-[26px] font-semibold tracking-tight text-ink">{existing ? 'Edit task' : 'New task'}</h1>

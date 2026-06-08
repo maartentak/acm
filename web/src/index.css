@@ -60,6 +60,22 @@ body {
 }
 
 @layer utilities {
+  /* Screen padding that ADDS a comfortable base to the safe-area inset (so the
+     header always has headroom, on notch and non-notch devices alike). */
+  .pt-screen {
+    padding-top: calc(env(safe-area-inset-top) + 2.25rem);
+  }
+  .pb-screen {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);
+  }
+  /* Bottom padding on screens that sit under the floating bottom nav. */
+  .pb-screen-nav {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 7.5rem);
+  }
+  /* The floating bottom bar's own offset from the screen edge. */
+  .pb-bar {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 1.25rem);
+  }
   .safe-top {
     padding-top: env(safe-area-inset-top);
   }

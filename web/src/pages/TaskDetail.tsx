@@ -18,7 +18,7 @@ export default function TaskDetail() {
 
   if (!task) {
     return (
-      <div className="px-5 pt-8 safe-top">
+      <div className="px-5 pt-screen">
         <IconButton onClick={() => navigate(-1)} aria="Back">
           <ArrowLeft size={20} />
         </IconButton>
@@ -45,7 +45,7 @@ export default function TaskDetail() {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 16 }}
       transition={{ duration: 0.2 }}
-      className="px-5 pb-12 pt-6 safe-top"
+      className="px-5 pt-screen pb-screen"
     >
       <div className="flex items-center justify-between">
         <IconButton onClick={() => navigate(-1)} aria="Back">

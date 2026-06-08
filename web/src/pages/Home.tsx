@@ -59,7 +59,7 @@ export default function Home() {
   ]
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-5 pb-28 pt-6 safe-top">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-5 pt-screen pb-screen-nav">
       <GradientHeader title={`${greeting()} 🖐`} subline={subline(doneToday, todo.length, stuckCount)} />
 
       <WeekStrip />

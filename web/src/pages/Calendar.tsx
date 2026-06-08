@@ -169,7 +169,7 @@ export default function Calendar() {
   const waiting = useMemo(() => tasks.filter((t) => t.status !== 'DONE' && t.scheduledAt == null).length, [tasks])
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-5 pb-28 pt-6 safe-top">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-5 pt-screen pb-screen-nav">
       <GradientHeader
         eyebrow="Your day"
         title={connected ? `${visible.filter((s) => s.task).length} fits across your free time` : 'Find time for your tasks'}

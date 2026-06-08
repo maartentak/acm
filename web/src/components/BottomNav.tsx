@@ -12,7 +12,7 @@ export default function BottomNav() {
     }`
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-5 pb-5 safe-bottom">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-5 pb-bar">
       <div className="pointer-events-auto flex w-full max-w-md items-center justify-between rounded-full border border-line bg-card px-7 py-2.5 shadow-soft">
         <button className={tab(pathname === '/')} onClick={() => navigate('/')} aria-label="Today">
           <Home size={23} strokeWidth={2} />
