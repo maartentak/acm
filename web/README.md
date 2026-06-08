@@ -73,8 +73,9 @@ src/
 
 Already wired. The Break-it-down button calls `breakDownTaskSmart()`
 (`src/lib/breakdown.ts`), which POSTs to the serverless function
-`api/breakdown.ts`. That function calls **Claude (`claude-opus-4-8`)** with an
-ADHD-tuned prompt and returns `{ steps: [...] }`. The `ANTHROPIC_API_KEY` lives
+`api/breakdown.ts`. That function calls **Claude (`claude-haiku-4-5`)** with an
+ADHD-tuned prompt and returns `{ steps: [...] }` — Haiku keeps the tap fast and
+cheap; bump it to a larger model in `api/breakdown.ts` if you want richer steps. The `ANTHROPIC_API_KEY` lives
 **only server-side** — it's never in the browser bundle. If the key is unset or
 the call fails/times out, the client silently falls back to the offline
 heuristic, so the feature always works.
