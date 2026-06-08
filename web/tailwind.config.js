@@ -16,8 +16,8 @@ export default {
       fontFamily: {
         // Body/UI text — clean and legible.
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        // Headings + numerals — distinctive, Nothing-OS-adjacent grotesk.
-        display: ['"Space Grotesk"', 'Inter', 'sans-serif'],
+        // Headings + numerals — light technical monospace, Nothing-OS feel.
+        display: ['"DM Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: {
