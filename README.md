@@ -1,7 +1,12 @@
 # Momentum — a living task list for ADHD brains
 
-Momentum is an Android app that helps you actually *finish* your never-ending
-to-do list. It's built around two ideas that most task apps miss:
+> **👉 The active version is the web app / PWA in [`web/`](web/).** It runs on
+> phone *and* desktop from one URL, and (unlike this native project) can be built
+> and previewed anywhere. The native Android project below is **parked** but kept
+> for reference.
+
+Momentum helps you actually *finish* your never-ending to-do list. It's built
+around two ideas that most task apps miss:
 
 1. **Break it down.** When a task has been sitting too long — postponed a few
    times or untouched for days — Momentum flags it as *stuck* and offers a
