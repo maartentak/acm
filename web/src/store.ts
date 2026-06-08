@@ -21,6 +21,7 @@ export interface NewTaskInput {
 interface MomentumState {
   tasks: Task[]
   calendarConnected: boolean
+  remindersEnabled: boolean
 
   quickAdd: (title: string) => void
   addTask: (input: NewTaskInput) => string
@@ -31,11 +32,18 @@ interface MomentumState {
   scheduleTask: (id: string, startMillis: number) => void
 
   breakDown: (id: string) => void
+  setSubtasks: (id: string, titles: string[]) => void
   toggleSubtask: (taskId: string, subtaskId: string) => void
 
   connectCalendar: () => void
   disconnectCalendar: () => void
+
+  setRemindersEnabled: (enabled: boolean) => void
+  markReminded: (id: string) => void
 }
+
+const newSubtasks = (titles: string[]) =>
+  titles.map((title) => ({ id: uid(), title, done: false }))
 
 function freshTask(input: NewTaskInput): Task {
   const now = Date.now()
@@ -52,6 +60,7 @@ function freshTask(input: NewTaskInput): Task {
     lastTouchedAt: now,
     completedAt: null,
     postponedCount: 0,
+    notifiedAt: null,
     subtasks: [],
   }
 }
@@ -61,6 +70,7 @@ export const useStore = create<MomentumState>()(
     (set, get) => ({
       tasks: [],
       calendarConnected: false,
+      remindersEnabled: false,
 
       quickAdd: (title) => {
         const clean = title.trim()
@@ -114,26 +124,24 @@ export const useStore = create<MomentumState>()(
       scheduleTask: (id, startMillis) =>
         set((s) => ({
           tasks: s.tasks.map((t) =>
-            t.id === id ? { ...t, scheduledAt: startMillis, lastTouchedAt: Date.now() } : t,
+            t.id === id
+              ? { ...t, scheduledAt: startMillis, notifiedAt: null, lastTouchedAt: Date.now() }
+              : t,
           ),
         })),
 
       breakDown: (id) => {
         const task = get().tasks.find((t) => t.id === id)
         if (!task) return
-        const steps = breakDownTask(task)
+        get().setSubtasks(id, breakDownTask(task))
+      },
+
+      setSubtasks: (id, titles) =>
         set((s) => ({
           tasks: s.tasks.map((t) =>
-            t.id === id
-              ? {
-                  ...t,
-                  subtasks: steps.map((title) => ({ id: uid(), title, done: false })),
-                  lastTouchedAt: Date.now(),
-                }
-              : t,
+            t.id === id ? { ...t, subtasks: newSubtasks(titles), lastTouchedAt: Date.now() } : t,
           ),
-        }))
-      },
+        })),
 
       toggleSubtask: (taskId, subtaskId) =>
         set((s) => ({
@@ -152,6 +160,12 @@ export const useStore = create<MomentumState>()(
 
       connectCalendar: () => set({ calendarConnected: true }),
       disconnectCalendar: () => set({ calendarConnected: false }),
+
+      setRemindersEnabled: (enabled) => set({ remindersEnabled: enabled }),
+      markReminded: (id) =>
+        set((s) => ({
+          tasks: s.tasks.map((t) => (t.id === id ? { ...t, notifiedAt: Date.now() } : t)),
+        })),
     }),
     { name: 'momentum' },
   ),

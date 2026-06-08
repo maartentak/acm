@@ -29,7 +29,19 @@ npm run build && npm run preview
 
 Everything works with **no accounts and no keys**: tasks persist locally
 (localStorage), the breakdown engine runs offline, and the calendar uses a
-realistic demo provider that computes genuine free slots.
+realistic demo provider that computes genuine free slots. Add the two optional
+secrets below to light up real Google Calendar and LLM-powered breakdown.
+
+## Optional configuration
+
+Copy `.env.example` and fill in what you want:
+
+| Variable | Where | Effect |
+|---|---|---|
+| `VITE_GOOGLE_CLIENT_ID` | client (`.env.local`) | Enables real Google sign-in on the Calendar screen. Unset → demo data. |
+| `ANTHROPIC_API_KEY` | server (host dashboard) | Enables LLM task breakdown via `/api/breakdown`. Unset → offline heuristic. |
+
+Both features **degrade gracefully** — the app is fully functional without either.
 
 ### Install to your home screen
 
@@ -57,35 +69,72 @@ src/
 └─ pages/              Home, TaskDetail, EditTask, Calendar
 ```
 
-## Upgrading "Break it down" to an LLM
+## LLM-powered breakdown
 
-`breakDownTask(task)` in `src/lib/breakdown.ts` is a pure function returning
-`string[]`. Swap its body for a `fetch` to your model endpoint (keep the same
-return shape) and nothing else changes. A good prompt mirrors the heuristic:
-3–6 steps, first step tiny and physical, concrete verbs, no vague "decide".
+Already wired. The Break-it-down button calls `breakDownTaskSmart()`
+(`src/lib/breakdown.ts`), which POSTs to the serverless function
+`api/breakdown.ts`. That function calls **Claude (`claude-opus-4-8`)** with an
+ADHD-tuned prompt and returns `{ steps: [...] }`. The `ANTHROPIC_API_KEY` lives
+**only server-side** — it's never in the browser bundle. If the key is unset or
+the call fails/times out, the client silently falls back to the offline
+heuristic, so the feature always works.
+
+To run the function locally, use `vercel dev` (or deploy). Under plain
+`npm run dev` the `/api` route 404s and the offline fallback kicks in — which is
+exactly the intended behavior.
 
 ## Connecting real Google Calendar
 
-The app already talks to the calendar through `src/lib/calendar.ts`; only the
-data source needs swapping.
+Already wired (`src/lib/google.ts`), gated behind `VITE_GOOGLE_CLIENT_ID`. One-time setup:
 
 1. In the [Google Cloud Console](https://console.cloud.google.com/), create a
-   project, enable the **Google Calendar API**, configure the OAuth consent
-   screen, and create a **Web OAuth client** with this app's origin as an
-   authorized JavaScript origin/redirect.
-2. Add **Google Identity Services** and sign the user in with the
-   `calendar.readonly` scope (do this for each account — work and personal).
-3. Replace `sampleDay()` with a call to the Calendar `freebusy` endpoint and keep
-   `freeSlots()` / `matchSlots()` exactly as they are — they already turn busy
-   blocks into free slots and match tasks to them.
+   project and **enable the Google Calendar API**.
+2. Configure the **OAuth consent screen** and add yourself as a test user; the
+   only scope needed is `.../auth/calendar.readonly`.
+3. Create an **OAuth client ID → Web application**. Add your origin (e.g.
+   `http://localhost:5173` and your deployed URL) to *Authorized JavaScript
+   origins*.
+4. Put the client ID in `.env.local` as `VITE_GOOGLE_CLIENT_ID` and rebuild.
 
-Because only `calendar.ts` knows where the data comes from, the UI is untouched.
+The Calendar screen then offers real Google sign-in (connect work *and* personal
+accounts — it accumulates free/busy across both). Momentum requests only the
+**read-only free/busy** scope; it never reads event details or writes anything.
+`computeFreeSlots()` / `matchSlots()` are shared by the demo and real providers,
+so the matching logic is identical either way.
+
+## Reminders & notifications
+
+The Calendar screen has a **Slot reminders** toggle. When on (and you grant
+notification permission), `useReminders()` fires a notification the moment a
+task's scheduled slot begins, via the service worker — working while the app is
+open or backgrounded. Each task is reminded once.
+
+**Limitation:** delivery when the app is *fully closed* needs **Web Push**
+(VAPID keys + a push server that stores subscriptions and sends pushes). That
+requires a backend with persistence, so it's intentionally left as a follow-up —
+the local reminder covers the common "I'm using my phone/laptop" case,
+especially on Android where the installed PWA stays warm.
 
 ## Deploying
 
-Any static host (Vercel, Netlify, Cloudflare Pages, GitHub Pages). It's an SPA,
-so configure a catch-all rewrite to `index.html` for client-side routes, and
-serve over HTTPS so the PWA/service worker activates.
+**Vercel is the recommended target** because it serves the static SPA *and* runs
+the `/api/breakdown` serverless function with no extra config. `vercel.json` is
+already set up (Vite framework + SPA rewrite that excludes `/api`).
+
+1. Import the repo in Vercel and set the **Root Directory** to `web/`.
+2. Add environment variables: `ANTHROPIC_API_KEY` (for LLM breakdown) and, if
+   using Google, `VITE_GOOGLE_CLIENT_ID`.
+3. Deploy. (CLI equivalent: `cd web && vercel`.)
+
+Then open the deployed HTTPS URL on your phone and **Add to Home Screen** to
+install it.
+
+> Static-only hosts (GitHub Pages, plain Cloudflare Pages, Netlify without
+> functions) work too, but the `/api/breakdown` endpoint won't exist there, so
+> breakdown uses the offline heuristic. Configure a catch-all rewrite to
+> `index.html` for client-side routing, and serve over HTTPS so the service
+> worker activates. Netlify/Cloudflare can host the function too if you port
+> `api/breakdown.ts` to their function format.
 
 ## Notes
 

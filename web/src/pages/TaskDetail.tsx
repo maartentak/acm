@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Clock, Loader2, Moon, Pencil, Sparkles, Trash2, Zap } from 'lucide-react'
 import { useStore } from '../store'
+import { breakDownTaskSmart } from '../lib/breakdown'
 import { ENERGY_LABEL, subtaskProgress } from '../types'
 import CompletionCheck from '../components/CompletionCheck'
 import PrimaryButton from '../components/PrimaryButton'
@@ -12,7 +13,7 @@ export default function TaskDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const task = useStore((s) => s.tasks.find((t) => t.id === id))
-  const { breakDown, toggleSubtask, toggleComplete, postpone, deleteTask } = useStore()
+  const { setSubtasks, toggleSubtask, toggleComplete, postpone, deleteTask } = useStore()
   const [breaking, setBreaking] = useState(false)
 
   if (!task) {
@@ -30,10 +31,13 @@ export default function TaskDetail() {
 
   const handleBreakDown = async () => {
     setBreaking(true)
-    // A brief beat so the "thinking" feels intentional, not jarring.
-    await new Promise((r) => setTimeout(r, 450))
-    breakDown(task.id)
-    setBreaking(false)
+    try {
+      // Uses the LLM endpoint when configured, else falls back to the offline engine.
+      const steps = await breakDownTaskSmart(task)
+      setSubtasks(task.id, steps)
+    } finally {
+      setBreaking(false)
+    }
   }
 
   return (

@@ -5,10 +5,12 @@ import Home from './pages/Home'
 import TaskDetail from './pages/TaskDetail'
 import EditTask from './pages/EditTask'
 import Calendar from './pages/Calendar'
+import { useReminders } from './hooks/useReminders'
 
 export default function App() {
   const location = useLocation()
   const showNav = location.pathname === '/' || location.pathname.startsWith('/calendar')
+  useReminders()
 
   return (
     <div className="mx-auto min-h-full w-full max-w-md">

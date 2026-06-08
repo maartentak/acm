@@ -43,25 +43,39 @@ export function sampleDay(): CalendarEvent[] {
   ]
 }
 
-/** Open gaps within waking hours where you could slot some work. */
-export function freeSlots(): FreeSlot[] {
-  const dayStart = Math.max(Date.now(), atHour(8))
-  const dayEnd = atHour(20)
+interface BusyInterval {
+  start: number
+  end: number
+}
+
+/**
+ * Turn a list of busy intervals into the open gaps within waking hours. Shared
+ * by the demo provider and the real Google Calendar provider — the only thing
+ * that differs between them is where the busy intervals come from.
+ */
+export function computeFreeSlots(busy: BusyInterval[], wakeHour = 8, sleepHour = 20): FreeSlot[] {
+  const dayStart = Math.max(Date.now(), atHour(wakeHour))
+  const dayEnd = atHour(sleepHour)
   if (dayEnd <= dayStart) return []
 
-  const busy = sampleDay()
+  const sorted = busy
     .filter((e) => e.end > dayStart && e.start < dayEnd)
     .sort((a, b) => a.start - b.start)
 
   const slots: FreeSlot[] = []
   let cursor = dayStart
-  for (const e of busy) {
+  for (const e of sorted) {
     if (e.start > cursor) slots.push({ start: cursor, end: e.start })
     cursor = Math.max(cursor, e.end)
   }
   if (cursor < dayEnd) slots.push({ start: cursor, end: dayEnd })
 
   return slots.filter((s) => slotMinutes(s) >= 15)
+}
+
+/** Demo free slots, derived from the sample day. */
+export function freeSlots(): FreeSlot[] {
+  return computeFreeSlots(sampleDay())
 }
 
 /** Energy people typically have through the day — used as a soft preference. */

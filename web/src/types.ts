@@ -26,6 +26,8 @@ export interface Task {
   lastTouchedAt: number
   completedAt: number | null
   postponedCount: number
+  /** When we last fired a reminder for this task's scheduled slot (null = none). */
+  notifiedAt: number | null
   subtasks: Subtask[]
 }
 

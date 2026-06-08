@@ -30,6 +30,40 @@ export function breakDownTask(task: Task): string[] {
   return dedupe(steps).slice(0, 6)
 }
 
+/**
+ * Best-effort smart breakdown: ask the serverless LLM endpoint first, and fall
+ * back to the offline heuristic if it's not configured, errors, or times out.
+ * The caller always gets steps — the upgrade is invisible.
+ */
+export async function breakDownTaskSmart(task: Task): Promise<string[]> {
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 12000)
+    const res = await fetch('/api/breakdown', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: task.title,
+        notes: task.notes,
+        estimatedMinutes: task.estimatedMinutes,
+        energy: task.energy,
+      }),
+      signal: controller.signal,
+    })
+    clearTimeout(timeout)
+    if (res.ok) {
+      const data = (await res.json()) as { steps?: unknown }
+      if (Array.isArray(data.steps) && data.steps.every((s) => typeof s === 'string')) {
+        const steps = (data.steps as string[]).map((s) => s.trim()).filter(Boolean)
+        if (steps.length > 0) return steps.slice(0, 6)
+      }
+    }
+  } catch {
+    // fall through to offline heuristic
+  }
+  return breakDownTask(task)
+}
+
 const has = (s: string, ...needles: string[]) => needles.some((n) => s.includes(n))
 
 function activationStep(lower: string, title: string): string {
