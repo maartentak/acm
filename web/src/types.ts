@@ -30,6 +30,8 @@ export interface Task {
   notifiedAt: number | null
   /** Hidden until this time (snooze); reappears once now passes it. */
   snoozedUntil: number | null
+  /** Set when a planned task's day passed undone and it rolled back to backlog. */
+  rolledOverAt: number | null
   /** Link back to Google Tasks for two-way completion sync (null = not imported). */
   googleTaskId: string | null
   googleListId: string | null
@@ -37,6 +39,24 @@ export interface Task {
 }
 
 const DAY = 1000 * 60 * 60 * 24
+
+export function startOfDayMs(ms: number): number {
+  const d = new Date(ms)
+  d.setHours(0, 0, 0, 0)
+  return d.getTime()
+}
+
+/** The day a task is planned for (from its time or its due date), or null. */
+export function plannedDay(task: Task): number | null {
+  if (task.scheduledAt != null) return startOfDayMs(task.scheduledAt)
+  if (task.dueAt != null) return startOfDayMs(task.dueAt)
+  return null
+}
+
+/** A task is "scheduled" if it has a time or a day and isn't done. */
+export function isScheduled(task: Task): boolean {
+  return task.status !== 'DONE' && (task.scheduledAt != null || task.dueAt != null)
+}
 
 export function subtaskProgress(task: Task): number {
   if (task.subtasks.length === 0) return 0

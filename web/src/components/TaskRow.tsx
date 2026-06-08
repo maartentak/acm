@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Clock, Sparkles, Zap } from 'lucide-react'
+import { Clock, RotateCcw, Sparkles, Zap } from 'lucide-react'
 import { ENERGY_LABEL, isStuck, subtaskProgress, type Task } from '../types'
 import CompletionCheck from './CompletionCheck'
 import ProgressRing from './ProgressRing'
@@ -33,6 +33,11 @@ export default function TaskRow({ task, onToggle, onClick }: Props) {
           {task.title}
         </p>
         <div className="label-mono mt-2 flex flex-wrap items-center gap-3 text-[10px] font-semibold">
+          {task.rolledOverAt != null && task.status !== 'DONE' && (
+            <span className="flex items-center gap-1 text-ink">
+              <RotateCcw size={12} /> Rolled over
+            </span>
+          )}
           {stuck && (
             <span className="flex items-center gap-1 text-ink">
               <Sparkles size={12} /> Stuck

@@ -13,9 +13,11 @@ import {
 } from '../lib/calendar'
 import { createEvent, fetchBusy, fetchGoogleTasks, isGoogleConfigured, requestAccessToken } from '../lib/google'
 import { notificationsSupported, requestNotificationPermission } from '../lib/notifications'
-import { slotRange } from '../lib/time'
+import { formatTime, slotRange } from '../lib/time'
+import { isScheduled, plannedDay, type Task } from '../types'
 import GradientHeader from '../components/GradientHeader'
 import PrimaryButton from '../components/PrimaryButton'
+import CompletionCheck from '../components/CompletionCheck'
 
 const TOKENS_KEY = 'momentum-gcal-tokens'
 const loadTokens = (): string[] => {
@@ -47,6 +49,7 @@ export default function Calendar() {
   const connectDemo = useStore((s) => s.connectCalendar)
   const disconnectDemo = useStore((s) => s.disconnectCalendar)
   const scheduleTask = useStore((s) => s.scheduleTask)
+  const toggleComplete = useStore((s) => s.toggleComplete)
   const remindersEnabled = useStore((s) => s.remindersEnabled)
   const setRemindersEnabled = useStore((s) => s.setRemindersEnabled)
   const availability = useStore((s) => s.availability)
@@ -168,6 +171,21 @@ export default function Calendar() {
   }, [visible])
   const waiting = useMemo(() => tasks.filter((t) => t.status !== 'DONE' && t.scheduledAt == null).length, [tasks])
 
+  // Agenda: scheduled tasks grouped by day (today onward), soonest first.
+  const agenda = useMemo(() => {
+    const today = dayKey(Date.now())
+    const scheduled = tasks
+      .filter((t) => isScheduled(t) && (plannedDay(t) ?? 0) >= today)
+      .sort((a, b) => (plannedDay(a) ?? 0) - (plannedDay(b) ?? 0) || (a.scheduledAt ?? Infinity) - (b.scheduledAt ?? Infinity))
+    const map = new Map<number, Task[]>()
+    for (const t of scheduled) {
+      const k = plannedDay(t)!
+      if (!map.has(k)) map.set(k, [])
+      map.get(k)!.push(t)
+    }
+    return [...map.entries()].sort((a, b) => a[0] - b[0])
+  }, [tasks])
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-5 pt-screen pb-screen-nav">
       <GradientHeader
@@ -198,8 +216,31 @@ export default function Calendar() {
         </a>
       )}
 
+      {agenda.length > 0 && (
+        <section className="mt-6">
+          <h2 className="label-mono text-[11px] font-semibold text-ink-soft">Your schedule</h2>
+          <div className="mt-3 space-y-5">
+            {agenda.map(([day, items]) => (
+              <div key={day}>
+                <p className="label-mono mb-2 text-[10px] font-semibold text-ink-faint">{dayLabel(day)}</p>
+                <div className="space-y-2.5">
+                  {items.map((t) => (
+                    <AgendaItem
+                      key={t.id}
+                      task={t}
+                      onToggle={() => toggleComplete(t.id)}
+                      onOpen={() => navigate(`/task/${t.id}`)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {!connected ? (
-        <div className="mt-5 rounded-card border border-line bg-card p-6 shadow-soft">
+        <div className="mt-6 rounded-card border border-line bg-card p-6 shadow-soft">
           <CalendarDays className="text-ink" size={32} strokeWidth={1.6} />
           <h2 className="mt-4 text-lg font-semibold text-ink">Connect Google Calendar</h2>
           <p className="mt-2 text-sm text-ink-soft">
@@ -291,6 +332,20 @@ export default function Calendar() {
         </>
       )}
     </motion.div>
+  )
+}
+
+function AgendaItem({ task, onToggle, onOpen }: { task: Task; onToggle: () => void; onOpen: () => void }) {
+  const time = task.scheduledAt != null ? formatTime(task.scheduledAt) : 'All day'
+  return (
+    <div
+      onClick={onOpen}
+      className="flex cursor-pointer items-center gap-3 rounded-card border border-line bg-card py-3 pl-4 pr-3 shadow-soft active:bg-fill"
+    >
+      <span className="tnum w-14 shrink-0 font-display text-[14px] text-ink">{time}</span>
+      <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-ink">{task.title}</span>
+      <CompletionCheck checked={task.status === 'DONE'} onToggle={onToggle} size={24} />
+    </div>
   )
 }
 

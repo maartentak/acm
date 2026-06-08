@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { EnergyLevel, Task } from './types'
+import { plannedDay, startOfDayMs } from './types'
 import { breakDownTask } from './lib/breakdown'
 import { DEFAULT_AVAILABILITY, type Availability } from './lib/calendar'
 import type { GoogleTask } from './lib/google'
@@ -35,6 +36,8 @@ interface MomentumState {
   /** Hide a task for 24h (swipe-left snooze); it reappears tomorrow. */
   snooze: (id: string) => void
   scheduleTask: (id: string, startMillis: number) => void
+  /** Roll planned-but-undone tasks whose day has passed back to the backlog. */
+  rollOverStale: () => void
 
   breakDown: (id: string) => void
   setSubtasks: (id: string, titles: string[]) => void
@@ -77,6 +80,7 @@ function freshTask(input: NewTaskInput): Task {
     postponedCount: 0,
     notifiedAt: null,
     snoozedUntil: null,
+    rolledOverAt: null,
     googleTaskId: null,
     googleListId: null,
     subtasks: [],
@@ -158,10 +162,27 @@ export const useStore = create<MomentumState>()(
         set((s) => ({
           tasks: s.tasks.map((t) =>
             t.id === id
-              ? { ...t, scheduledAt: startMillis, notifiedAt: null, lastTouchedAt: Date.now() }
+              ? { ...t, scheduledAt: startMillis, notifiedAt: null, rolledOverAt: null, lastTouchedAt: Date.now() }
               : t,
           ),
         })),
+
+      /** Roll planned-but-undone tasks back to the backlog once their day has passed. */
+      rollOverStale: () =>
+        set((s) => {
+          const today = startOfDayMs(Date.now())
+          let changed = false
+          const tasks = s.tasks.map((t) => {
+            if (t.status === 'DONE') return t
+            const day = plannedDay(t)
+            if (day != null && day < today) {
+              changed = true
+              return { ...t, scheduledAt: null, dueAt: null, rolledOverAt: Date.now() }
+            }
+            return t
+          })
+          return changed ? { tasks } : {}
+        }),
 
       breakDown: (id) => {
         const task = get().tasks.find((t) => t.id === id)

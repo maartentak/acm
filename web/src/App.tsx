@@ -8,12 +8,14 @@ import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
 import { useReminders } from './hooks/useReminders'
 import { useGoogleTaskSync } from './hooks/useGoogleTaskSync'
+import { useRollover } from './hooks/useRollover'
 
 export default function App() {
   const location = useLocation()
   const showNav = location.pathname === '/' || location.pathname.startsWith('/calendar')
   useReminders()
   useGoogleTaskSync()
+  useRollover()
 
   return (
     <div className="mx-auto min-h-full w-full max-w-md">

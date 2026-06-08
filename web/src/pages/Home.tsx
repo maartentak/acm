@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { addDays, isSameDay, startOfWeek } from 'date-fns'
 import { CheckCheck, SlidersHorizontal } from 'lucide-react'
 import { useStore } from '../store'
-import { isSnoozed, isStuck, type Task } from '../types'
+import { isScheduled, isSnoozed, isStuck, plannedDay, type Task } from '../types'
 import { greeting } from '../lib/time'
 import GradientHeader from '../components/GradientHeader'
 import TaskRow from '../components/TaskRow'
@@ -34,14 +34,19 @@ export default function Home() {
     const start = new Date()
     start.setHours(0, 0, 0, 0)
     return {
-      todo: active.sort(
-        (a, b) =>
-          Number(isStuck(b)) - Number(isStuck(a)) ||
-          (a.dueAt ?? Infinity) - (b.dueAt ?? Infinity) ||
-          b.lastTouchedAt - a.lastTouchedAt,
-      ),
+      // Backlog: active tasks that still need a time or day.
+      todo: active
+        .filter((t) => !isScheduled(t))
+        .sort(
+          (a, b) =>
+            Number(isStuck(b)) - Number(isStuck(a)) ||
+            b.lastTouchedAt - a.lastTouchedAt,
+        ),
+      // Scheduled: active tasks with a plan, soonest first.
+      pending: active
+        .filter(isScheduled)
+        .sort((a, b) => (plannedDay(a) ?? 0) - (plannedDay(b) ?? 0) || (a.scheduledAt ?? 0) - (b.scheduledAt ?? 0)),
       done: tasks.filter((t) => t.status === 'DONE').sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0)),
-      pending: active.filter((t) => t.scheduledAt != null).sort((a, b) => (a.scheduledAt ?? 0) - (b.scheduledAt ?? 0)),
       doneToday: tasks.filter((t) => t.status === 'DONE' && (t.completedAt ?? 0) >= start.getTime()).length,
     }
   }, [tasks])
@@ -55,9 +60,9 @@ export default function Home() {
   }
 
   const tabs: { id: Tab; label: string; count: number }[] = [
-    { id: 'todo', label: 'To do', count: todo.length },
-    { id: 'done', label: 'Completed', count: done.length },
-    { id: 'pending', label: 'Pending', count: pending.length },
+    { id: 'todo', label: 'Backlog', count: todo.length },
+    { id: 'pending', label: 'Scheduled', count: pending.length },
+    { id: 'done', label: 'Done', count: done.length },
   ]
 
   return (
