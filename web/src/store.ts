@@ -48,6 +48,11 @@ interface MomentumState {
 
   /** Import Google Tasks, skipping any already linked. Returns how many were added. */
   importGoogleTasks: (items: GoogleTask[]) => number
+
+  /** Remove all tasks from Momentum (does NOT delete them from Google Tasks). */
+  clearTasks: () => void
+  /** Wipe local tasks + settings back to a clean slate. */
+  resetApp: () => void
 }
 
 const newSubtasks = (titles: string[]) =>
@@ -197,6 +202,15 @@ export const useStore = create<MomentumState>()(
         })
         return added
       },
+
+      clearTasks: () => set({ tasks: [] }),
+      resetApp: () =>
+        set({
+          tasks: [],
+          calendarConnected: false,
+          remindersEnabled: false,
+          availability: DEFAULT_AVAILABILITY,
+        }),
     }),
     { name: 'momentum' },
   ),

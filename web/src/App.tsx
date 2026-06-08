@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import TaskDetail from './pages/TaskDetail'
 import EditTask from './pages/EditTask'
 import Calendar from './pages/Calendar'
+import Settings from './pages/Settings'
 import { useReminders } from './hooks/useReminders'
 import { useGoogleTaskSync } from './hooks/useGoogleTaskSync'
 
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/task/:id" element={<TaskDetail />} />
           <Route path="/new" element={<EditTask />} />
           <Route path="/task/:id/edit" element={<EditTask />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </AnimatePresence>
       {showNav && <BottomNav />}

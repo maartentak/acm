@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { addDays, isSameDay, startOfWeek } from 'date-fns'
-import { CheckCheck } from 'lucide-react'
+import { CheckCheck, SlidersHorizontal } from 'lucide-react'
 import { useStore } from '../store'
 import { isStuck, type Task } from '../types'
 import { greeting } from '../lib/time'
@@ -60,7 +60,18 @@ export default function Home() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-5 pt-screen pb-screen-nav">
-      <GradientHeader title={`${greeting()} 🖐`} subline={subline(doneToday, todo.length, stuckCount)} />
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <GradientHeader title={`${greeting()} 🖐`} subline={subline(doneToday, todo.length, stuckCount)} />
+        </div>
+        <button
+          onClick={() => navigate('/settings')}
+          aria-label="Settings"
+          className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line bg-card text-ink shadow-soft active:bg-fill"
+        >
+          <SlidersHorizontal size={18} />
+        </button>
+      </div>
 
       <WeekStrip />
 
