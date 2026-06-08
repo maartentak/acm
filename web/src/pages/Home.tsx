@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import { addDays, isSameDay, startOfWeek } from 'date-fns'
 import { CheckCheck, SlidersHorizontal } from 'lucide-react'
 import { useStore } from '../store'
-import { isStuck, type Task } from '../types'
+import { isSnoozed, isStuck, type Task } from '../types'
 import { greeting } from '../lib/time'
 import GradientHeader from '../components/GradientHeader'
 import TaskRow from '../components/TaskRow'
+import SwipeRow from '../components/SwipeRow'
 
 type Tab = 'todo' | 'done' | 'pending'
 
@@ -24,11 +25,12 @@ export default function Home() {
   const tasks = useStore((s) => s.tasks)
   const quickAdd = useStore((s) => s.quickAdd)
   const toggleComplete = useStore((s) => s.toggleComplete)
+  const snooze = useStore((s) => s.snooze)
   const [draft, setDraft] = useState('')
   const [tab, setTab] = useState<Tab>('todo')
 
   const { todo, done, pending, doneToday } = useMemo(() => {
-    const active = tasks.filter((t) => t.status !== 'DONE')
+    const active = tasks.filter((t) => t.status !== 'DONE' && !isSnoozed(t))
     const start = new Date()
     start.setHours(0, 0, 0, 0)
     return {
@@ -91,9 +93,15 @@ export default function Home() {
           <EmptyState tab={tab} />
         ) : (
           <AnimatePresence initial={false}>
-            {list.map((t) => (
-              <TaskRow key={t.id} task={t} onToggle={() => toggleComplete(t.id)} onClick={() => navigate(`/task/${t.id}`)} />
-            ))}
+            {list.map((t) =>
+              tab === 'done' ? (
+                <TaskRow key={t.id} task={t} onToggle={() => toggleComplete(t.id)} onClick={() => navigate(`/task/${t.id}`)} />
+              ) : (
+                <SwipeRow key={t.id} onComplete={() => toggleComplete(t.id)} onSnooze={() => snooze(t.id)}>
+                  <TaskRow task={t} onToggle={() => toggleComplete(t.id)} onClick={() => navigate(`/task/${t.id}`)} />
+                </SwipeRow>
+              ),
+            )}
           </AnimatePresence>
         )}
       </div>

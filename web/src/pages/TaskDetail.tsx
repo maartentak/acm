@@ -13,7 +13,7 @@ export default function TaskDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const task = useStore((s) => s.tasks.find((t) => t.id === id))
-  const { setSubtasks, toggleSubtask, toggleComplete, postpone, deleteTask } = useStore()
+  const { setSubtasks, toggleSubtask, toggleComplete, snooze, deleteTask } = useStore()
   const [breaking, setBreaking] = useState(false)
 
   if (!task) {
@@ -140,10 +140,13 @@ export default function TaskDetail() {
           {task.status === 'DONE' ? 'Mark as not done' : 'Complete task'}
         </PrimaryButton>
         <button
-          onClick={() => postpone(task.id)}
+          onClick={() => {
+            snooze(task.id)
+            navigate(-1)
+          }}
           className="mt-3 flex w-full items-center justify-center gap-2 py-2 text-sm text-ink-soft"
         >
-          <Moon size={16} /> Not today — push to tomorrow
+          <Moon size={16} /> Not today — snooze for 24h
         </button>
       </div>
     </motion.div>

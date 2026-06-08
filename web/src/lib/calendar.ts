@@ -1,5 +1,5 @@
 import type { EnergyLevel, Task } from '../types'
-import { isStuck } from '../types'
+import { isSnoozed, isStuck } from '../types'
 
 export type CalendarSource = 'WORK' | 'PERSONAL'
 
@@ -110,7 +110,7 @@ function energyForHour(millis: number): EnergyLevel {
 /** Greedily place the best-fitting task into each slot, preferring an energy match. */
 export function matchSlots(slots: FreeSlot[], tasks: Task[]): SlotSuggestion[] {
   const candidates = tasks
-    .filter((t) => t.status !== 'DONE' && t.scheduledAt == null)
+    .filter((t) => t.status !== 'DONE' && t.scheduledAt == null && !isSnoozed(t))
     .sort((a, b) => {
       const stuckDiff = Number(isStuck(b)) - Number(isStuck(a))
       if (stuckDiff !== 0) return stuckDiff

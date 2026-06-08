@@ -32,6 +32,8 @@ interface MomentumState {
   deleteTask: (id: string) => void
   toggleComplete: (id: string) => void
   postpone: (id: string) => void
+  /** Hide a task for 24h (swipe-left snooze); it reappears tomorrow. */
+  snooze: (id: string) => void
   scheduleTask: (id: string, startMillis: number) => void
 
   breakDown: (id: string) => void
@@ -74,6 +76,7 @@ function freshTask(input: NewTaskInput): Task {
     completedAt: null,
     postponedCount: 0,
     notifiedAt: null,
+    snoozedUntil: null,
     googleTaskId: null,
     googleListId: null,
     subtasks: [],
@@ -131,6 +134,20 @@ export const useStore = create<MomentumState>()(
                   ...t,
                   postponedCount: t.postponedCount + 1,
                   dueAt: Date.now() + DAY,
+                  lastTouchedAt: Date.now(),
+                }
+              : t,
+          ),
+        })),
+
+      snooze: (id) =>
+        set((s) => ({
+          tasks: s.tasks.map((t) =>
+            t.id === id
+              ? {
+                  ...t,
+                  snoozedUntil: Date.now() + DAY,
+                  postponedCount: t.postponedCount + 1,
                   lastTouchedAt: Date.now(),
                 }
               : t,

@@ -28,6 +28,8 @@ export interface Task {
   postponedCount: number
   /** When we last fired a reminder for this task's scheduled slot (null = none). */
   notifiedAt: number | null
+  /** Hidden until this time (snooze); reappears once now passes it. */
+  snoozedUntil: number | null
   /** Link back to Google Tasks for two-way completion sync (null = not imported). */
   googleTaskId: string | null
   googleListId: string | null
@@ -43,6 +45,11 @@ export function subtaskProgress(task: Task): number {
 
 export function daysSinceTouched(task: Task, now = Date.now()): number {
   return Math.floor((now - task.lastTouchedAt) / DAY)
+}
+
+/** Snoozed tasks are temporarily hidden until their snooze time passes. */
+export function isSnoozed(task: Task, now = Date.now()): boolean {
+  return task.snoozedUntil != null && task.snoozedUntil > now
 }
 
 /**
