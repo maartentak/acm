@@ -9,9 +9,22 @@
  * See web/README.md → "Connecting real Google Calendar" for the one-time setup.
  */
 
-const SCOPE =
-  'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events'
+const SCOPE = [
+  'https://www.googleapis.com/auth/calendar.readonly',
+  'https://www.googleapis.com/auth/calendar.events',
+  'https://www.googleapis.com/auth/tasks',
+].join(' ')
 const GIS_SRC = 'https://accounts.google.com/gsi/client'
+
+const TOKENS_KEY = 'momentum-gcal-tokens'
+/** Connected access tokens (short-lived) persisted by the Calendar screen. */
+export function readGoogleTokens(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(TOKENS_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
 
 export const googleClientId = (): string | undefined => import.meta.env.VITE_GOOGLE_CLIENT_ID
 export const isGoogleConfigured = (): boolean => !!googleClientId()
@@ -124,4 +137,65 @@ export async function createEvent(
   if (!res.ok) throw new Error(`createEvent ${res.status}`)
   const data = (await res.json()) as { htmlLink?: string }
   return data.htmlLink ?? ''
+}
+
+/* ---------------- Google Tasks ---------------- */
+
+export interface GoogleTask {
+  id: string
+  listId: string
+  title: string
+  notes: string
+  due: number | null
+}
+
+/** Pull all incomplete Google Tasks across the account's task lists. */
+export async function fetchGoogleTasks(token: string): Promise<GoogleTask[]> {
+  const listsRes = await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!listsRes.ok) throw new Error(`taskLists ${listsRes.status}`)
+  const lists = ((await listsRes.json()) as { items?: { id: string }[] }).items ?? []
+
+  const out: GoogleTask[] = []
+  for (const list of lists) {
+    const res = await fetch(
+      `https://tasks.googleapis.com/tasks/v1/lists/${list.id}/tasks?showCompleted=false&showHidden=false&maxResults=100`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    )
+    if (!res.ok) continue
+    const items = ((await res.json()) as { items?: { id: string; title?: string; notes?: string; due?: string }[] }).items ?? []
+    for (const t of items) {
+      if (!t.title?.trim()) continue // Google allows blank-title rows; skip them
+      out.push({
+        id: t.id,
+        listId: list.id,
+        title: t.title.trim(),
+        notes: t.notes ?? '',
+        due: t.due ? Date.parse(t.due) : null,
+      })
+    }
+  }
+  return out
+}
+
+/** Mark a Google task completed / not completed (two-way sync). */
+export async function setGoogleTaskCompleted(
+  token: string,
+  listId: string,
+  taskId: string,
+  completed: boolean,
+): Promise<void> {
+  const res = await fetch(
+    `https://tasks.googleapis.com/tasks/v1/lists/${listId}/tasks/${taskId}`,
+    {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: completed ? 'completed' : 'needsAction',
+        completed: completed ? new Date().toISOString() : null,
+      }),
+    },
+  )
+  if (!res.ok) throw new Error(`patchTask ${res.status}`)
 }

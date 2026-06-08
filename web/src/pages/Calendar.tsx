@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { format, isToday, isTomorrow } from 'date-fns'
-import { Bell, CalendarCheck, CalendarDays, Check, ExternalLink, Flower2 } from 'lucide-react'
+import { Bell, CalendarCheck, CalendarDays, Check, ExternalLink, Flower2, ListChecks } from 'lucide-react'
 import { useStore } from '../store'
 import {
   freeSlotsInWindow,
@@ -11,7 +11,7 @@ import {
   slotMinutes,
   type SlotSuggestion,
 } from '../lib/calendar'
-import { createEvent, fetchBusy, isGoogleConfigured, requestAccessToken } from '../lib/google'
+import { createEvent, fetchBusy, fetchGoogleTasks, isGoogleConfigured, requestAccessToken } from '../lib/google'
 import { notificationsSupported, requestNotificationPermission } from '../lib/notifications'
 import { slotRange } from '../lib/time'
 import GradientHeader from '../components/GradientHeader'
@@ -51,6 +51,7 @@ export default function Calendar() {
   const setRemindersEnabled = useStore((s) => s.setRemindersEnabled)
   const availability = useStore((s) => s.availability)
   const setAvailability = useStore((s) => s.setAvailability)
+  const importGoogleTasks = useStore((s) => s.importGoogleTasks)
 
   const googleReady = isGoogleConfigured()
   const [tokens, setTokens] = useState<string[]>(loadTokens)
@@ -58,8 +59,25 @@ export default function Calendar() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [scheduledLink, setScheduledLink] = useState<string | null>(null)
+  const [importing, setImporting] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
 
   const connected = demoConnected || tokens.length > 0
+
+  const doImport = async () => {
+    setImporting(true)
+    setNotice(null)
+    setError(null)
+    try {
+      const all = (await Promise.all(tokens.map((t) => fetchGoogleTasks(t)))).flat()
+      const n = importGoogleTasks(all)
+      setNotice(n > 0 ? `Imported ${n} task${n > 1 ? 's' : ''} from Google Tasks` : 'No new Google Tasks to import')
+    } catch {
+      setError('Couldn’t read Google Tasks. Reconnect, and make sure the Tasks API is enabled in your Google project.')
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const loadBusy = useCallback(async () => {
     if (tokens.length === 0) {
@@ -165,6 +183,7 @@ export default function Calendar() {
       />
 
       {error && <p className="mt-3 rounded-control bg-danger/10 px-4 py-2.5 text-sm text-danger">{error}</p>}
+      {notice && <p className="mt-3 rounded-control bg-orange/15 px-4 py-2.5 text-sm font-medium text-amber">{notice}</p>}
       {scheduledLink && (
         <a
           href={scheduledLink}
@@ -217,6 +236,17 @@ export default function Calendar() {
           />
 
           <ReminderToggle enabled={remindersEnabled} supported={notificationsSupported()} onToggle={toggleReminders} />
+
+          {tokens.length > 0 && (
+            <button
+              onClick={doImport}
+              disabled={importing}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-espresso-2 px-6 py-3.5 text-[15px] font-semibold text-sand disabled:opacity-50"
+            >
+              <ListChecks size={18} className="text-orange" />
+              {importing ? 'Importing…' : 'Import from Google Tasks'}
+            </button>
+          )}
 
           <div className="mt-6 flex items-center justify-between">
             <h2 className="label-mono text-[11px] font-semibold text-ink-soft">Opportunities in your week</h2>

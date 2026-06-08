@@ -28,6 +28,9 @@ export interface Task {
   postponedCount: number
   /** When we last fired a reminder for this task's scheduled slot (null = none). */
   notifiedAt: number | null
+  /** Link back to Google Tasks for two-way completion sync (null = not imported). */
+  googleTaskId: string | null
+  googleListId: string | null
   subtasks: Subtask[]
 }
 

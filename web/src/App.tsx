@@ -6,11 +6,13 @@ import TaskDetail from './pages/TaskDetail'
 import EditTask from './pages/EditTask'
 import Calendar from './pages/Calendar'
 import { useReminders } from './hooks/useReminders'
+import { useGoogleTaskSync } from './hooks/useGoogleTaskSync'
 
 export default function App() {
   const location = useLocation()
   const showNav = location.pathname === '/' || location.pathname.startsWith('/calendar')
   useReminders()
+  useGoogleTaskSync()
 
   return (
     <div className="mx-auto min-h-full w-full max-w-md">

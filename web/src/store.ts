@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import type { EnergyLevel, Task } from './types'
 import { breakDownTask } from './lib/breakdown'
 import { DEFAULT_AVAILABILITY, type Availability } from './lib/calendar'
+import type { GoogleTask } from './lib/google'
 
 const uid = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -44,6 +45,9 @@ interface MomentumState {
   markReminded: (id: string) => void
 
   setAvailability: (patch: Partial<Availability>) => void
+
+  /** Import Google Tasks, skipping any already linked. Returns how many were added. */
+  importGoogleTasks: (items: GoogleTask[]) => number
 }
 
 const newSubtasks = (titles: string[]) =>
@@ -65,6 +69,8 @@ function freshTask(input: NewTaskInput): Task {
     completedAt: null,
     postponedCount: 0,
     notifiedAt: null,
+    googleTaskId: null,
+    googleListId: null,
     subtasks: [],
   }
 }
@@ -174,6 +180,23 @@ export const useStore = create<MomentumState>()(
 
       setAvailability: (patch) =>
         set((s) => ({ availability: { ...s.availability, ...patch } })),
+
+      importGoogleTasks: (items) => {
+        let added = 0
+        set((s) => {
+          const linked = new Set(s.tasks.map((t) => t.googleTaskId).filter(Boolean))
+          const toAdd = items
+            .filter((i) => !linked.has(i.id))
+            .map((i) => ({
+              ...freshTask({ title: i.title, notes: i.notes, dueAt: i.due }),
+              googleTaskId: i.id,
+              googleListId: i.listId,
+            }))
+          added = toAdd.length
+          return added > 0 ? { tasks: [...toAdd, ...s.tasks] } : {}
+        })
+        return added
+      },
     }),
     { name: 'momentum' },
   ),

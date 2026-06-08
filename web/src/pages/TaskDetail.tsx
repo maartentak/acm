@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Clock, Loader2, Moon, Pencil, Sparkles, Trash2, Zap } from 'lucide-react'
+import { ArrowLeft, Clock, ListChecks, Loader2, Moon, Pencil, Sparkles, Trash2, Zap } from 'lucide-react'
 import { useStore } from '../store'
 import { breakDownTaskSmart } from '../lib/breakdown'
 import { ENERGY_LABEL, subtaskProgress } from '../types'
@@ -79,6 +79,7 @@ export default function TaskDetail() {
         <Chip icon={<Zap size={13} />}>{ENERGY_LABEL[task.energy]}</Chip>
         {task.estimatedMinutes != null && <Chip icon={<Clock size={13} />}>{task.estimatedMinutes} min</Chip>}
         {task.postponedCount > 0 && <Chip icon={<Moon size={13} />}>Put off {task.postponedCount}×</Chip>}
+        {task.googleTaskId && <Chip icon={<ListChecks size={13} />}>Google task</Chip>}
       </div>
 
       {task.notes && <p className="mt-4 text-[15px] leading-relaxed text-ink-soft">{task.notes}</p>}

@@ -113,9 +113,27 @@ calendar** (`createEvent()` in `src/lib/google.ts`) for the task's estimated
 duration, so it shows up in Google Calendar — and marks the task scheduled
 locally. If the calendar write fails it still schedules locally and tells you.
 
-> **Already connected before this update?** The write scope is new, so **Disconnect
-> and reconnect** once to grant calendar-write access — otherwise scheduling will
-> add the slot locally but won't appear in Google Calendar.
+> **Already connected before a scope changed?** New scopes (calendar-write, and
+> Google Tasks below) require you to **Disconnect and reconnect** once to grant
+> them — otherwise those features silently no-op.
+
+## Importing Google Tasks (two-way)
+
+Momentum can pull in your **Google Tasks** (the checklist in Calendar's sidebar)
+so you can break them down and schedule them — and completing one in Momentum
+marks it done in Google too.
+
+Setup (once): in the Google Cloud Console, **enable the Google Tasks API** (same
+place you enabled the Calendar API). The `tasks` scope is already requested at
+sign-in, so reconnect once if you connected earlier.
+
+- **Import** — Calendar screen → **Import from Google Tasks**. Pulls incomplete
+  tasks across all your lists (`fetchGoogleTasks()`), linked by ID so re-importing
+  never duplicates.
+- **Complete sync** — ticking a linked task done anywhere in Momentum patches it
+  to completed in Google (`useGoogleTaskSync()` → `setGoogleTaskCompleted()`),
+  trying each connected account's token. Tokens are short-lived, so this works
+  for toggles made while the app is open; re-import reconciles the rest.
 
 ## Reminders & notifications
 
