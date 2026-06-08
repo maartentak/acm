@@ -9,7 +9,7 @@ interface Props {
   className?: string
 }
 
-/** Primary call to action: a warm orange pill that presses in when tapped. */
+/** Primary call to action: a solid black pill that presses in when tapped. */
 export default function PrimaryButton({ children, onClick, disabled, icon, className = '' }: Props) {
   return (
     <motion.button
@@ -17,7 +17,7 @@ export default function PrimaryButton({ children, onClick, disabled, icon, class
       onClick={onClick}
       disabled={disabled}
       whileTap={{ scale: 0.97 }}
-      className={`flex h-14 w-full items-center justify-center gap-2 rounded-full bg-orange px-6 text-[15px] font-semibold text-white shadow-lift transition-opacity hover:bg-amber disabled:opacity-40 ${className}`}
+      className={`flex h-14 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-30 ${className}`}
     >
       {icon}
       {children}

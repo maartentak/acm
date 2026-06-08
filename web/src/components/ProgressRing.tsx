@@ -12,10 +12,10 @@ export default function ProgressRing({
   progress,
   size = 40,
   stroke = 5,
-  color = '#F97316',
-  trackColor = 'rgba(237,231,223,0.18)',
+  color = '#0A0A0A',
+  trackColor = '#E7E5E1',
   label = false,
-  labelColor = '#EDE7DF',
+  labelColor = '#0A0A0A',
 }: Props) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
@@ -38,7 +38,7 @@ export default function ProgressRing({
         />
       </svg>
       {label && (
-        <span className="absolute text-[10px] font-semibold" style={{ color: labelColor }}>
+        <span className="absolute font-mono text-[9px] font-semibold" style={{ color: labelColor }}>
           {Math.round(clamped * 100)}
         </span>
       )}

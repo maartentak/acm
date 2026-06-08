@@ -1,19 +1,22 @@
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { CheckCheck, Sparkles } from 'lucide-react'
-import { completedToday, useStore } from '../store'
+import { addDays, isSameDay, startOfWeek } from 'date-fns'
+import { CheckCheck } from 'lucide-react'
+import { useStore } from '../store'
 import { isStuck, type Task } from '../types'
 import { greeting } from '../lib/time'
 import GradientHeader from '../components/GradientHeader'
 import TaskRow from '../components/TaskRow'
 
-function headline(done: number, open: number, stuck: number): string {
-  if (done >= 3) return `You've finished ${done} today — you're on a roll.`
-  if (done > 0) return `${done} done already. Keep the momentum going.`
-  if (stuck > 0) return "A few things are stuck. Let's make one of them tiny."
-  if (open === 0) return 'Your list is clear. Add the next thing when you’re ready.'
-  return 'One small start is all today needs.'
+type Tab = 'todo' | 'done' | 'pending'
+
+function subline(done: number, open: number, stuck: number): string {
+  if (done >= 3) return `${done} done today — you're on a roll.`
+  if (done > 0) return `${done} done. Keep the momentum going.`
+  if (stuck > 0) return "Let's make one stuck thing tiny."
+  if (open === 0) return 'Your list is clear.'
+  return "Let's make progress today."
 }
 
 export default function Home() {
@@ -22,104 +25,129 @@ export default function Home() {
   const quickAdd = useStore((s) => s.quickAdd)
   const toggleComplete = useStore((s) => s.toggleComplete)
   const [draft, setDraft] = useState('')
+  const [tab, setTab] = useState<Tab>('todo')
 
-  const { active, stuck, done } = useMemo(() => {
-    const act = tasks
-      .filter((t) => t.status !== 'DONE')
-      .sort((a, b) => (a.dueAt ?? Infinity) - (b.dueAt ?? Infinity) || b.lastTouchedAt - a.lastTouchedAt)
+  const { todo, done, pending, doneToday } = useMemo(() => {
+    const active = tasks.filter((t) => t.status !== 'DONE')
+    const start = new Date()
+    start.setHours(0, 0, 0, 0)
     return {
-      active: act,
-      stuck: act.filter((t: Task) => isStuck(t)),
-      done: completedToday(tasks),
+      todo: active.sort(
+        (a, b) =>
+          Number(isStuck(b)) - Number(isStuck(a)) ||
+          (a.dueAt ?? Infinity) - (b.dueAt ?? Infinity) ||
+          b.lastTouchedAt - a.lastTouchedAt,
+      ),
+      done: tasks.filter((t) => t.status === 'DONE').sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0)),
+      pending: active.filter((t) => t.scheduledAt != null).sort((a, b) => (a.scheduledAt ?? 0) - (b.scheduledAt ?? 0)),
+      doneToday: tasks.filter((t) => t.status === 'DONE' && (t.completedAt ?? 0) >= start.getTime()).length,
     }
   }, [tasks])
+
+  const stuckCount = useMemo(() => todo.filter((t: Task) => isStuck(t)).length, [todo])
+  const list = tab === 'todo' ? todo : tab === 'done' ? done : pending
 
   const submit = () => {
     quickAdd(draft)
     setDraft('')
   }
 
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="px-5 pb-28 pt-5 safe-top"
-    >
-      <GradientHeader
-        eyebrow={`${greeting()} · News for you`}
-        headline={headline(done, active.length, stuck.length)}
-      />
+  const tabs: { id: Tab; label: string; count: number }[] = [
+    { id: 'todo', label: 'To do', count: todo.length },
+    { id: 'done', label: 'Completed', count: done.length },
+    { id: 'pending', label: 'Pending', count: pending.length },
+  ]
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <StatTile value={done} label="Done today" />
-        <StatTile value={active.length} label="On your plate" />
-      </div>
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-5 pb-28 pt-6 safe-top">
+      <GradientHeader title={`${greeting()} 🖐`} subline={subline(doneToday, todo.length, stuckCount)} />
+
+      <WeekStrip />
 
       <input
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && submit()}
         placeholder="Add a task — just brain-dump it"
-        className="mt-4 w-full rounded-control border border-line bg-paper px-4 py-3.5 text-[15px] text-ink outline-none placeholder:text-ink-soft/70 focus:border-orange"
+        className="mt-5 w-full rounded-control border border-line bg-card px-4 py-3.5 text-[15px] text-ink shadow-soft outline-none placeholder:text-ink-faint focus:border-ink"
       />
 
-      {stuck.length > 0 && (
-        <section className="mt-7">
-          <SectionHeader title="Stuck · let's unstick one" trailing={`${stuck.length}`} />
-          <div className="mt-3 space-y-3">
-            <AnimatePresence initial={false}>
-              {stuck.map((t) => (
-                <div key={`stuck-${t.id}`} className="rounded-card bg-orange/15 p-1.5">
-                  <div className="label-mono flex items-center gap-1.5 px-3 pt-1.5 pb-1 text-[10px] font-semibold text-amber">
-                    <Sparkles size={12} /> Putting this off — tap to break it down
-                  </div>
-                  <TaskRow task={t} onToggle={() => toggleComplete(t.id)} onClick={() => navigate(`/task/${t.id}`)} />
-                </div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </section>
-      )}
+      <SegTabs tabs={tabs} active={tab} onChange={setTab} />
 
-      <section className="mt-7">
-        <SectionHeader title="Your tasks" trailing={`${active.length} open`} />
-        <div className="mt-3 space-y-3">
-          {active.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-card bg-espresso p-5 shadow-bento">
-              <CheckCheck className="text-orange" />
-              <div>
-                <p className="font-medium text-sand">All clear</p>
-                <p className="text-sm text-sand-soft">Nothing open right now. Add the next thing when you’re ready.</p>
-              </div>
-            </div>
-          ) : (
-            <AnimatePresence initial={false}>
-              {active.map((t) => (
-                <TaskRow key={t.id} task={t} onToggle={() => toggleComplete(t.id)} onClick={() => navigate(`/task/${t.id}`)} />
-              ))}
-            </AnimatePresence>
-          )}
-        </div>
-      </section>
+      <div className="mt-4 space-y-3">
+        {list.length === 0 ? (
+          <EmptyState tab={tab} />
+        ) : (
+          <AnimatePresence initial={false}>
+            {list.map((t) => (
+              <TaskRow key={t.id} task={t} onToggle={() => toggleComplete(t.id)} onClick={() => navigate(`/task/${t.id}`)} />
+            ))}
+          </AnimatePresence>
+        )}
+      </div>
     </motion.div>
   )
 }
 
-function StatTile({ value, label }: { value: number; label: string }) {
+function WeekStrip() {
+  const today = new Date()
+  const monday = startOfWeek(today, { weekStartsOn: 1 })
+  const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i))
+  const wd = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   return (
-    <div className="rounded-card bg-espresso p-5 shadow-bento">
-      <p className="text-4xl font-medium tracking-tight text-orange">{value}</p>
-      <p className="label-mono mt-1 text-[10px] font-semibold text-sand-soft">{label}</p>
+    <div className="mt-5 flex items-stretch justify-between gap-1.5 rounded-card border border-line bg-card p-2 shadow-soft">
+      {days.map((d, i) => {
+        const on = isSameDay(d, today)
+        return (
+          <div
+            key={i}
+            className={`flex flex-1 flex-col items-center gap-1 rounded-[16px] py-2 ${on ? 'bg-fill' : ''}`}
+          >
+            <span className={`label-mono text-[9px] font-semibold ${on ? 'text-ink-soft' : 'text-ink-faint'}`}>{wd[i]}</span>
+            <span className={`font-dot text-[18px] leading-none ${on ? 'text-ink' : 'text-ink-faint'}`}>{d.getDate()}</span>
+          </div>
+        )
+      })}
     </div>
   )
 }
 
-function SectionHeader({ title, trailing }: { title: string; trailing?: string }) {
+function SegTabs({ tabs, active, onChange }: { tabs: { id: Tab; label: string; count: number }[]; active: Tab; onChange: (t: Tab) => void }) {
   return (
-    <div className="flex items-center justify-between">
-      <h2 className="label-mono text-[11px] font-semibold text-ink-soft">{title}</h2>
-      {trailing && <span className="label-mono text-[11px] font-semibold text-ink-soft/70">{trailing}</span>}
+    <div className="mt-6 flex gap-1 rounded-full border border-line bg-card p-1 shadow-soft">
+      {tabs.map((t) => {
+        const on = active === t.id
+        return (
+          <button
+            key={t.id}
+            onClick={() => onChange(t.id)}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-2.5 text-[13px] font-medium transition-colors ${
+              on ? 'bg-ink text-white' : 'text-ink-soft'
+            }`}
+          >
+            {t.label}
+            <span className={`font-mono text-[10px] ${on ? 'text-white/70' : 'text-ink-faint'}`}>{t.count}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function EmptyState({ tab }: { tab: Tab }) {
+  const copy =
+    tab === 'done'
+      ? { t: 'Nothing completed yet', s: 'Tick something off and it’ll land here.' }
+      : tab === 'pending'
+        ? { t: 'Nothing scheduled', s: 'Schedule a task on the Calendar tab to see it here.' }
+        : { t: 'All clear', s: 'Add the next thing when you’re ready.' }
+  return (
+    <div className="flex items-center gap-3 rounded-card border border-line bg-card p-5 shadow-soft">
+      <CheckCheck className="text-ink" size={22} />
+      <div>
+        <p className="font-medium text-ink">{copy.t}</p>
+        <p className="text-sm text-ink-soft">{copy.s}</p>
+      </div>
     </div>
   )
 }

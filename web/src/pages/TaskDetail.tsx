@@ -68,8 +68,8 @@ export default function TaskDetail() {
       </div>
 
       <h1
-        className={`mt-5 text-3xl font-medium leading-tight tracking-tight ${
-          task.status === 'DONE' ? 'text-ink-soft line-through' : 'text-ink'
+        className={`mt-5 text-[28px] font-semibold leading-tight tracking-tight ${
+          task.status === 'DONE' ? 'text-ink-faint line-through' : 'text-ink'
         }`}
       >
         {task.title}
@@ -85,10 +85,10 @@ export default function TaskDetail() {
       {task.notes && <p className="mt-4 text-[15px] leading-relaxed text-ink-soft">{task.notes}</p>}
 
       {/* Break it down */}
-      <div className="mt-6 rounded-card bg-espresso p-5 shadow-bento">
+      <div className="mt-6 rounded-card border border-line bg-card p-5 shadow-soft">
         <div className="flex items-center gap-2.5">
-          <Sparkles className="text-orange" size={22} />
-          <h2 className="text-lg font-medium text-sand">Make it doable</h2>
+          <Sparkles className="text-ink" size={20} />
+          <h2 className="text-lg font-semibold text-ink">Make it doable</h2>
           {task.subtasks.length > 0 && (
             <div className="ml-auto">
               <ProgressRing progress={progress} size={40} label />
@@ -97,7 +97,7 @@ export default function TaskDetail() {
         </div>
 
         {task.subtasks.length === 0 && (
-          <p className="mt-2 text-sm text-sand-soft">
+          <p className="mt-2 text-sm text-ink-soft">
             Stuck or staring at it? Let Momentum split this into tiny, obvious steps you can just start.
           </p>
         )}
@@ -113,7 +113,7 @@ export default function TaskDetail() {
                 className="flex items-center gap-3.5 py-2"
               >
                 <CompletionCheck checked={sub.done} onToggle={() => toggleSubtask(task.id, sub.id)} />
-                <span className={`text-[15px] ${sub.done ? 'text-sand-soft line-through' : 'text-sand'}`}>
+                <span className={`text-[15px] ${sub.done ? 'text-ink-faint line-through' : 'text-ink'}`}>
                   {sub.title}
                 </span>
               </motion.div>
@@ -123,8 +123,8 @@ export default function TaskDetail() {
 
         <div className="mt-4">
           {breaking ? (
-            <div className="flex items-center gap-3 py-2 text-sand-soft">
-              <Loader2 className="animate-spin text-orange" size={20} />
+            <div className="flex items-center gap-3 py-2 text-ink-soft">
+              <Loader2 className="animate-spin text-ink" size={20} />
               <span className="text-sm">Breaking it down…</span>
             </div>
           ) : (
@@ -155,7 +155,7 @@ function IconButton({ children, onClick, aria }: { children: React.ReactNode; on
     <button
       onClick={onClick}
       aria-label={aria}
-      className="flex h-12 w-12 items-center justify-center rounded-full bg-espresso text-sand active:bg-espresso-2"
+      className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-card text-ink shadow-soft active:bg-fill"
     >
       {children}
     </button>
@@ -164,7 +164,7 @@ function IconButton({ children, onClick, aria }: { children: React.ReactNode; on
 
 function Chip({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <span className="label-mono flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1.5 text-[10px] font-semibold text-ink-soft">
+    <span className="label-mono flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1.5 text-[10px] font-semibold text-ink-soft">
       {icon}
       {children}
     </span>

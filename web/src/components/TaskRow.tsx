@@ -21,36 +21,34 @@ export default function TaskRow({ task, onToggle, onClick }: Props) {
       exit={{ opacity: 0, scale: 0.96 }}
       whileTap={{ scale: 0.99 }}
       onClick={onClick}
-      className="flex cursor-pointer items-center gap-3.5 rounded-card bg-espresso p-4 shadow-bento"
+      className="flex cursor-pointer items-center gap-3.5 rounded-card border border-line bg-card p-4 shadow-soft"
     >
       <CompletionCheck checked={task.status === 'DONE'} onToggle={onToggle} />
       <div className="min-w-0 flex-1">
         <p
           className={`truncate text-[15px] font-medium ${
-            task.status === 'DONE' ? 'text-sand-soft line-through' : 'text-sand'
+            task.status === 'DONE' ? 'text-ink-faint line-through' : 'text-ink'
           }`}
         >
           {task.title}
         </p>
         <div className="label-mono mt-1.5 flex flex-wrap items-center gap-3 text-[10px] font-semibold">
           {stuck && (
-            <span className="flex items-center gap-1 text-orange">
+            <span className="flex items-center gap-1 text-ink">
               <Sparkles size={12} /> Stuck
             </span>
           )}
           {task.estimatedMinutes != null && (
-            <span className="flex items-center gap-1 text-sand-soft">
+            <span className="flex items-center gap-1 text-ink-faint">
               <Clock size={12} /> {task.estimatedMinutes}m
             </span>
           )}
-          <span className="flex items-center gap-1 text-sand-soft">
+          <span className="flex items-center gap-1 text-ink-faint">
             <Zap size={12} /> {ENERGY_LABEL[task.energy]}
           </span>
         </div>
       </div>
-      {task.subtasks.length > 0 && (
-        <ProgressRing progress={progress} size={34} stroke={4} label />
-      )}
+      {task.subtasks.length > 0 && <ProgressRing progress={progress} size={34} stroke={4} label />}
     </motion.div>
   )
 }

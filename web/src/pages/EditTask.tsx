@@ -48,7 +48,7 @@ export default function EditTask() {
   }
 
   const field =
-    'w-full rounded-control border border-line bg-paper px-4 py-3.5 text-[15px] text-ink outline-none placeholder:text-ink-soft/70 focus:border-orange'
+    'w-full rounded-control border border-line bg-card px-4 py-3.5 text-[15px] text-ink shadow-soft outline-none placeholder:text-ink-faint focus:border-ink'
 
   return (
     <motion.div
@@ -63,7 +63,7 @@ export default function EditTask() {
         <button
           onClick={() => navigate(-1)}
           aria-label="Close"
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-espresso text-sand active:bg-espresso-2"
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-card text-ink shadow-soft active:bg-fill"
         >
           <X size={20} />
         </button>
@@ -141,8 +141,8 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-control px-4 py-3 text-sm font-semibold transition-colors ${grow ? 'flex-1' : ''} ${
-        selected ? 'bg-orange text-white' : 'border border-line bg-paper text-ink-soft'
+      className={`rounded-control px-4 py-3 text-sm font-medium transition-colors ${grow ? 'flex-1' : ''} ${
+        selected ? 'bg-ink text-white' : 'border border-line bg-card text-ink-soft'
       }`}
     >
       {children}

@@ -14,9 +14,10 @@ Two ideas most task apps miss:
    reads your free/busy times and surfaces the real pockets in your day where a
    waiting task actually fits, matched to the energy you tend to have then.
 
-Warm, dashboard-style UI (the "Nexus" design system: cream canvas, espresso
-bento cards, orange accents, Inter + JetBrains Mono) with smooth Framer Motion
-animations and satisfying, haptic task completion.
+Clean, understated, monochrome UI (Nothing-OS inspired: light-grey canvas, white
+cards with hairline borders, black pill controls, serif-italic accent line, mono
++ dot-matrix numerals) with smooth Framer Motion animations and satisfying,
+haptic task completion.
 
 ## Run it
 

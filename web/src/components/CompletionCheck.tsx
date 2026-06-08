@@ -27,7 +27,7 @@ export default function CompletionCheck({ checked, onToggle, size = 28 }: Props)
       whileTap={{ scale: 0.85 }}
       transition={{ type: 'spring', stiffness: 500, damping: 18 }}
       className={`flex shrink-0 items-center justify-center rounded-full border-2 ${
-        checked ? 'border-orange bg-orange' : 'border-sand-soft bg-transparent'
+        checked ? 'border-ink bg-ink' : 'border-ink-faint bg-transparent'
       }`}
       style={{ width: size, height: size }}
     >

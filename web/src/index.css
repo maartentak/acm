@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&family=DotGothic16&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -16,8 +16,8 @@ body,
 
 body {
   margin: 0;
-  background-color: #e4e2dd;
-  color: #111827;
+  background-color: #f2f1ef;
+  color: #0a0a0a;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -28,7 +28,7 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cfccc4;
+  background: #d8d6d2;
   border-radius: 8px;
 }
 
@@ -39,10 +39,15 @@ body {
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
-  /* JetBrains Mono uppercase metadata labels, per the Nexus design. */
+  /* Mono uppercase micro-labels (Nothing-OS technical tone). */
   .label-mono {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
+  }
+  /* Serif italic accent line. */
+  .accent-serif {
+    font-family: 'Newsreader', Georgia, serif;
+    font-style: italic;
   }
 }

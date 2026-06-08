@@ -4,36 +4,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Canvas + light surfaces
-        cream: '#E4E2DD',
-        paper: '#FFFFFF',
-        // Dark "bento" surfaces
-        espresso: '#2C1D11',
-        'espresso-2': '#3A2818',
-        // Brand
-        orange: '#F97316',
-        amber: '#D97706',
-        // Text on light canvas
-        ink: '#111827',
-        'ink-soft': '#4B5563',
-        line: '#E5E7EB',
-        // Text on dark surfaces
-        sand: '#EDE7DF',
-        'sand-soft': '#A99E8E',
-        // Feedback
-        danger: '#DC2626',
+        canvas: '#F2F1EF', // warm light grey page
+        card: '#FFFFFF',
+        ink: '#0A0A0A', // near-black, primary + text
+        'ink-soft': '#6B7280',
+        'ink-faint': '#A1A1AA',
+        line: '#E7E5E1', // hairline borders
+        fill: '#F0EEEA', // nested panels / inputs / inactive pills
+        danger: '#D7263D', // the single reserved accent (errors/destructive)
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['Newsreader', 'Georgia', 'Times New Roman', 'serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        dot: ['"DotGothic16"', '"JetBrains Mono"', 'monospace'],
       },
       borderRadius: {
-        card: '32px',
-        control: '24px',
+        card: '28px',
+        control: '20px',
       },
       boxShadow: {
-        bento: '0 18px 40px -24px rgba(44, 29, 17, 0.45)',
-        lift: '0 10px 30px -12px rgba(44, 29, 17, 0.35)',
+        soft: '0 1px 2px rgba(10,10,10,0.04), 0 10px 30px -20px rgba(10,10,10,0.18)',
       },
       keyframes: {
         'rise-in': {
@@ -41,9 +32,7 @@ export default {
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
       },
-      animation: {
-        'rise-in': 'rise-in 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
-      },
+      animation: { 'rise-in': 'rise-in 0.35s cubic-bezier(0.22, 1, 0.36, 1)' },
     },
   },
   plugins: [],
