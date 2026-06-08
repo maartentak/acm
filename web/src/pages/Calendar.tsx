@@ -176,8 +176,16 @@ export default function Calendar() {
         subline={connected ? undefined : 'Connect your calendars to begin.'}
       />
 
-      {error && <p className="mt-4 rounded-control bg-danger/10 px-4 py-2.5 text-sm text-danger">{error}</p>}
-      {notice && <p className="mt-4 rounded-control border border-line bg-card px-4 py-2.5 text-sm font-medium text-ink shadow-soft">{notice}</p>}
+      {error && (
+        <p role="alert" className="mt-4 rounded-control bg-danger/10 px-4 py-2.5 text-sm text-danger">
+          {error}
+        </p>
+      )}
+      {notice && (
+        <p aria-live="polite" className="mt-4 rounded-control border border-line bg-card px-4 py-2.5 text-sm font-medium text-ink shadow-soft">
+          {notice}
+        </p>
+      )}
       {scheduledLink && (
         <a
           href={scheduledLink}
@@ -350,17 +358,20 @@ function AvailabilityCard({
     <div className="mt-5 rounded-card border border-line bg-card p-5 shadow-soft">
       <p className="label-mono text-[10px] font-semibold text-ink-soft">When I'm available</p>
       <div className="mt-3 flex items-center gap-3">
-        <HourSelect value={startHour} options={hours.slice(0, 24)} onChange={(v) => onChange({ startHour: v })} />
+        <HourSelect label="Available from" value={startHour} options={hours.slice(0, 24)} onChange={(v) => onChange({ startHour: v })} />
         <span className="text-ink-soft">to</span>
-        <HourSelect value={endHour} options={hours.slice(1)} onChange={(v) => onChange({ endHour: v })} />
+        <HourSelect label="Available until" value={endHour} options={hours.slice(1)} onChange={(v) => onChange({ endHour: v })} />
       </div>
-      <div className="mt-4 flex gap-2">
+      <div className="mt-4 flex justify-between">
         {WEEKDAYS.map((d, i) => {
           const on = weekdays.includes(i)
+          const full = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][i]
           return (
             <button
               key={i}
               onClick={() => toggleDay(i)}
+              aria-pressed={on}
+              aria-label={full}
               className={`h-10 w-10 rounded-full text-[13px] font-medium transition-colors ${
                 on ? 'bg-ink text-white' : 'bg-fill text-ink-faint'
               }`}
@@ -374,11 +385,12 @@ function AvailabilityCard({
   )
 }
 
-function HourSelect({ value, options, onChange }: { value: number; options: number[]; onChange: (v: number) => void }) {
+function HourSelect({ label, value, options, onChange }: { label: string; value: number; options: number[]; onChange: (v: number) => void }) {
   return (
     <select
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
+      aria-label={label}
       className="tnum rounded-control bg-fill px-3 py-2.5 font-display text-[15px] text-ink outline-none"
     >
       {options.map((h) => (

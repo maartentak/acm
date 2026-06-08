@@ -8,10 +8,37 @@
   color-scheme: light;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body,
 #root {
   height: 100%;
+}
+
+/* Keyboard focus ring (keyboard-only via :focus-visible). box-shadow so it
+   follows each element's border-radius and isn't killed by outline-none. */
+:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #f2f1ef,
+    0 0 0 4px #0a0a0a;
+}
+
+/* Honor reduced-motion: neutralize animations, transitions, and smooth scroll. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {

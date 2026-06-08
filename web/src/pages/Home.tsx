@@ -68,6 +68,7 @@ export default function Home() {
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && submit()}
+        aria-label="Add a task"
         placeholder="Add a task — just brain-dump it"
         className="mt-6 w-full rounded-control border border-line bg-card px-4 py-4 text-[15px] text-ink shadow-soft outline-none placeholder:text-ink-faint focus:border-ink"
       />

@@ -73,6 +73,7 @@ export default function EditTask() {
         autoFocus
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        aria-label="Task title"
         placeholder="What needs doing?"
         className={`mt-6 ${field}`}
       />
@@ -80,6 +81,7 @@ export default function EditTask() {
       <textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
+        aria-label="Notes"
         placeholder="Notes, context, links… (optional)"
         rows={3}
         className={`mt-3 resize-none ${field}`}

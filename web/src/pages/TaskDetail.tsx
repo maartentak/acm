@@ -110,7 +110,7 @@ export default function TaskDetail() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06, type: 'spring', stiffness: 300, damping: 24 }}
-                className="flex items-center gap-3.5 py-2"
+                className="flex items-center gap-2.5 py-1.5"
               >
                 <CompletionCheck checked={sub.done} onToggle={() => toggleSubtask(task.id, sub.id)} />
                 <span className={`text-[15px] ${sub.done ? 'text-ink-faint line-through' : 'text-ink'}`}>

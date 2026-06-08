@@ -21,7 +21,7 @@ export default function TaskRow({ task, onToggle, onClick }: Props) {
       exit={{ opacity: 0, scale: 0.96 }}
       whileTap={{ scale: 0.99 }}
       onClick={onClick}
-      className="flex cursor-pointer items-center gap-4 rounded-card border border-line bg-card p-[18px] shadow-soft"
+      className="flex cursor-pointer items-center gap-2.5 rounded-card border border-line bg-card py-[18px] pl-3 pr-[18px] shadow-soft"
     >
       <CompletionCheck checked={task.status === 'DONE'} onToggle={onToggle} />
       <div className="min-w-0 flex-1">
