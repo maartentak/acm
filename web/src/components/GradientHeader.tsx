@@ -6,22 +6,21 @@ interface Props {
 }
 
 /**
- * The signature hero panel: a deep-blue gradient wash with a soft glow, an
- * eyebrow label and a large motivating headline that cross-fades as it changes.
+ * The signature hero: a dark espresso "bento" panel with a warm orange glow, a
+ * mono eyebrow label, and a large Inter headline that cross-fades as it changes.
  */
 export default function GradientHeader({ eyebrow, headline }: Props) {
   return (
-    <div className="relative overflow-hidden rounded-3xl p-6">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#13234f] via-accent-deep to-[#0b1020]" />
+    <div className="relative overflow-hidden rounded-card bg-espresso p-6 shadow-bento">
       <div
-        className="absolute inset-0"
+        className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(520px circle at 25% 20%, rgba(92,141,255,0.45), transparent 60%)',
+            'radial-gradient(420px circle at 82% 8%, rgba(249,115,22,0.35), transparent 60%)',
         }}
       />
       <div className="relative">
-        <p className="text-[13px] font-semibold tracking-wide text-white/70">{eyebrow}</p>
+        <p className="label-mono text-[11px] font-semibold text-orange">{eyebrow}</p>
         <AnimatePresence mode="wait">
           <motion.h1
             key={headline}
@@ -29,7 +28,7 @@ export default function GradientHeader({ eyebrow, headline }: Props) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.3 }}
-            className="mt-3 max-w-[18ch] text-3xl font-semibold leading-tight text-white"
+            className="mt-3 max-w-[18ch] text-3xl font-medium leading-[1.08] tracking-tight text-sand"
           >
             {headline}
           </motion.h1>

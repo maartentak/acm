@@ -47,6 +47,9 @@ export default function EditTask() {
     navigate(-1)
   }
 
+  const field =
+    'w-full rounded-control border border-line bg-paper px-4 py-3.5 text-[15px] text-ink outline-none placeholder:text-ink-soft/70 focus:border-orange'
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -56,11 +59,11 @@ export default function EditTask() {
       className="px-5 pb-12 pt-6 safe-top"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-on-ink">{existing ? 'Edit task' : 'New task'}</h1>
+        <h1 className="text-2xl font-medium tracking-tight text-ink">{existing ? 'Edit task' : 'New task'}</h1>
         <button
           onClick={() => navigate(-1)}
           aria-label="Close"
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-card text-on-ink active:bg-ink-elevated"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-espresso text-sand active:bg-espresso-2"
         >
           <X size={20} />
         </button>
@@ -71,7 +74,7 @@ export default function EditTask() {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="What needs doing?"
-        className="mt-6 w-full rounded-2xl border border-ink-border bg-ink-card px-4 py-3.5 text-[15px] text-on-ink outline-none placeholder:text-on-ink-faint focus:border-accent"
+        className={`mt-6 ${field}`}
       />
 
       <textarea
@@ -79,7 +82,7 @@ export default function EditTask() {
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Notes, context, links… (optional)"
         rows={3}
-        className="mt-3 w-full resize-none rounded-2xl border border-ink-border bg-ink-card px-4 py-3.5 text-[15px] text-on-ink outline-none placeholder:text-on-ink-faint focus:border-accent"
+        className={`mt-3 resize-none ${field}`}
       />
 
       <Group title="Energy needed">
@@ -118,7 +121,7 @@ export default function EditTask() {
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-6">
-      <h2 className="text-[11px] font-medium uppercase tracking-wider text-on-ink-muted">{title}</h2>
+      <h2 className="label-mono text-[11px] font-semibold text-ink-soft">{title}</h2>
       <div className="mt-2.5 flex flex-wrap gap-2.5">{children}</div>
     </div>
   )
@@ -138,10 +141,8 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${grow ? 'flex-1' : ''} ${
-        selected
-          ? 'bg-accent text-white'
-          : 'border border-ink-border bg-ink-card text-on-ink-muted'
+      className={`rounded-control px-4 py-3 text-sm font-semibold transition-colors ${grow ? 'flex-1' : ''} ${
+        selected ? 'bg-orange text-white' : 'border border-line bg-paper text-ink-soft'
       }`}
     >
       {children}

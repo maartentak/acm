@@ -22,7 +22,7 @@ export default function TaskDetail() {
         <IconButton onClick={() => navigate(-1)} aria="Back">
           <ArrowLeft size={20} />
         </IconButton>
-        <p className="mt-8 text-on-ink-muted">This task no longer exists.</p>
+        <p className="mt-8 text-ink-soft">This task no longer exists.</p>
       </div>
     )
   }
@@ -32,7 +32,6 @@ export default function TaskDetail() {
   const handleBreakDown = async () => {
     setBreaking(true)
     try {
-      // Uses the LLM endpoint when configured, else falls back to the offline engine.
       const steps = await breakDownTaskSmart(task)
       setSubtasks(task.id, steps)
     } finally {
@@ -69,8 +68,8 @@ export default function TaskDetail() {
       </div>
 
       <h1
-        className={`mt-5 text-3xl font-semibold leading-tight ${
-          task.status === 'DONE' ? 'text-on-ink-muted line-through' : 'text-on-ink'
+        className={`mt-5 text-3xl font-medium leading-tight tracking-tight ${
+          task.status === 'DONE' ? 'text-ink-soft line-through' : 'text-ink'
         }`}
       >
         {task.title}
@@ -82,22 +81,22 @@ export default function TaskDetail() {
         {task.postponedCount > 0 && <Chip icon={<Moon size={13} />}>Put off {task.postponedCount}×</Chip>}
       </div>
 
-      {task.notes && <p className="mt-4 text-[15px] leading-relaxed text-on-ink-muted">{task.notes}</p>}
+      {task.notes && <p className="mt-4 text-[15px] leading-relaxed text-ink-soft">{task.notes}</p>}
 
       {/* Break it down */}
-      <div className="mt-6 rounded-3xl bg-ink-card p-5">
+      <div className="mt-6 rounded-card bg-espresso p-5 shadow-bento">
         <div className="flex items-center gap-2.5">
-          <Sparkles className="text-accent-bright" size={22} />
-          <h2 className="text-lg font-semibold text-on-ink">Make it doable</h2>
+          <Sparkles className="text-orange" size={22} />
+          <h2 className="text-lg font-medium text-sand">Make it doable</h2>
           {task.subtasks.length > 0 && (
             <div className="ml-auto">
-              <ProgressRing progress={progress} size={40} color={progress >= 1 ? '#3ddc97' : '#2f6bff'} label />
+              <ProgressRing progress={progress} size={40} label />
             </div>
           )}
         </div>
 
         {task.subtasks.length === 0 && (
-          <p className="mt-2 text-sm text-on-ink-muted">
+          <p className="mt-2 text-sm text-sand-soft">
             Stuck or staring at it? Let Momentum split this into tiny, obvious steps you can just start.
           </p>
         )}
@@ -113,7 +112,7 @@ export default function TaskDetail() {
                 className="flex items-center gap-3.5 py-2"
               >
                 <CompletionCheck checked={sub.done} onToggle={() => toggleSubtask(task.id, sub.id)} />
-                <span className={`text-[15px] ${sub.done ? 'text-on-ink-muted line-through' : 'text-on-ink'}`}>
+                <span className={`text-[15px] ${sub.done ? 'text-sand-soft line-through' : 'text-sand'}`}>
                   {sub.title}
                 </span>
               </motion.div>
@@ -123,8 +122,8 @@ export default function TaskDetail() {
 
         <div className="mt-4">
           {breaking ? (
-            <div className="flex items-center gap-3 py-2 text-on-ink-muted">
-              <Loader2 className="animate-spin text-accent-bright" size={20} />
+            <div className="flex items-center gap-3 py-2 text-sand-soft">
+              <Loader2 className="animate-spin text-orange" size={20} />
               <span className="text-sm">Breaking it down…</span>
             </div>
           ) : (
@@ -141,7 +140,7 @@ export default function TaskDetail() {
         </PrimaryButton>
         <button
           onClick={() => postpone(task.id)}
-          className="mt-3 flex w-full items-center justify-center gap-2 py-2 text-sm text-on-ink-muted"
+          className="mt-3 flex w-full items-center justify-center gap-2 py-2 text-sm text-ink-soft"
         >
           <Moon size={16} /> Not today — push to tomorrow
         </button>
@@ -155,7 +154,7 @@ function IconButton({ children, onClick, aria }: { children: React.ReactNode; on
     <button
       onClick={onClick}
       aria-label={aria}
-      className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-card text-on-ink active:bg-ink-elevated"
+      className="flex h-12 w-12 items-center justify-center rounded-full bg-espresso text-sand active:bg-espresso-2"
     >
       {children}
     </button>
@@ -164,7 +163,7 @@ function IconButton({ children, onClick, aria }: { children: React.ReactNode; on
 
 function Chip({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <span className="flex items-center gap-1.5 rounded-full bg-ink-card px-3 py-1.5 text-[11px] text-on-ink-muted">
+    <span className="label-mono flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1.5 text-[10px] font-semibold text-ink-soft">
       {icon}
       {children}
     </span>

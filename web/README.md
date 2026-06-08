@@ -14,8 +14,9 @@ Two ideas most task apps miss:
    reads your free/busy times and surfaces the real pockets in your day where a
    waiting task actually fits, matched to the energy you tend to have then.
 
-Dark, minimal, modern, with smooth Framer Motion animations and satisfying,
-haptic task completion.
+Warm, dashboard-style UI (the "Nexus" design system: cream canvas, espresso
+bento cards, orange accents, Inter + JetBrains Mono) with smooth Framer Motion
+animations and satisfying, haptic task completion.
 
 ## Run it
 
@@ -98,10 +99,23 @@ Already wired (`src/lib/google.ts`), gated behind `VITE_GOOGLE_CLIENT_ID`. One-t
 4. Put the client ID in `.env.local` as `VITE_GOOGLE_CLIENT_ID` and rebuild.
 
 The Calendar screen then offers real Google sign-in (connect work *and* personal
-accounts — it accumulates free/busy across both). Momentum requests only the
-**read-only free/busy** scope; it never reads event details or writes anything.
-`computeFreeSlots()` / `matchSlots()` are shared by the demo and real providers,
-so the matching logic is identical either way.
+accounts — it accumulates free/busy across both). Momentum requests two scopes:
+**read-only free/busy** (to find gaps) and **calendar.events** (to add the slot
+you pick). It never reads your event *contents*.
+
+**Finding time:** `freeSlotsInWindow()` scans the next ~8 days, clips each day to
+your **availability window** (set in-app on the Calendar screen — working hours +
+which weekdays), subtracts busy time, and `matchSlots()` fits waiting tasks by
+size and the energy you tend to have at that hour. Suggestions are grouped by day.
+
+**Writing back:** "Schedule it here" creates a timed event on your **primary
+calendar** (`createEvent()` in `src/lib/google.ts`) for the task's estimated
+duration, so it shows up in Google Calendar — and marks the task scheduled
+locally. If the calendar write fails it still schedules locally and tells you.
+
+> **Already connected before this update?** The write scope is new, so **Disconnect
+> and reconnect** once to grant calendar-write access — otherwise scheduling will
+> add the slot locally but won't appear in Google Calendar.
 
 ## Reminders & notifications
 

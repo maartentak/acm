@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { EnergyLevel, Task } from './types'
 import { breakDownTask } from './lib/breakdown'
+import { DEFAULT_AVAILABILITY, type Availability } from './lib/calendar'
 
 const uid = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -22,6 +23,7 @@ interface MomentumState {
   tasks: Task[]
   calendarConnected: boolean
   remindersEnabled: boolean
+  availability: Availability
 
   quickAdd: (title: string) => void
   addTask: (input: NewTaskInput) => string
@@ -40,6 +42,8 @@ interface MomentumState {
 
   setRemindersEnabled: (enabled: boolean) => void
   markReminded: (id: string) => void
+
+  setAvailability: (patch: Partial<Availability>) => void
 }
 
 const newSubtasks = (titles: string[]) =>
@@ -71,6 +75,7 @@ export const useStore = create<MomentumState>()(
       tasks: [],
       calendarConnected: false,
       remindersEnabled: false,
+      availability: DEFAULT_AVAILABILITY,
 
       quickAdd: (title) => {
         const clean = title.trim()
@@ -166,6 +171,9 @@ export const useStore = create<MomentumState>()(
         set((s) => ({
           tasks: s.tasks.map((t) => (t.id === id ? { ...t, notifiedAt: Date.now() } : t)),
         })),
+
+      setAvailability: (patch) =>
+        set((s) => ({ availability: { ...s.availability, ...patch } })),
     }),
     { name: 'momentum' },
   ),
