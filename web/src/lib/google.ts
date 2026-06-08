@@ -9,7 +9,8 @@
  * See web/README.md → "Connecting real Google Calendar" for the one-time setup.
  */
 
-const SCOPE = 'https://www.googleapis.com/auth/calendar.readonly'
+const SCOPE =
+  'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events'
 const GIS_SRC = 'https://accounts.google.com/gsi/client'
 
 export const googleClientId = (): string | undefined => import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -95,4 +96,32 @@ export async function fetchBusy(
     }
   }
   return intervals
+}
+
+/**
+ * Create a timed event on the account's primary calendar so the scheduled task
+ * shows up in Google Calendar. Requires the calendar.events scope (reconnect if
+ * you connected before this was added). Returns the event's htmlLink.
+ */
+export async function createEvent(
+  token: string,
+  summary: string,
+  startMillis: number,
+  endMillis: number,
+  description = '',
+): Promise<string> {
+  const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      summary,
+      description,
+      start: { dateTime: new Date(startMillis).toISOString() },
+      end: { dateTime: new Date(endMillis).toISOString() },
+      reminders: { useDefault: true },
+    }),
+  })
+  if (!res.ok) throw new Error(`createEvent ${res.status}`)
+  const data = (await res.json()) as { htmlLink?: string }
+  return data.htmlLink ?? ''
 }

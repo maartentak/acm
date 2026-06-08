@@ -46,11 +46,14 @@ export default function Home() {
       exit={{ opacity: 0 }}
       className="px-5 pb-28 pt-5 safe-top"
     >
-      <GradientHeader eyebrow={`${greeting()} · News for you`} headline={headline(done, active.length, stuck.length)} />
+      <GradientHeader
+        eyebrow={`${greeting()} · News for you`}
+        headline={headline(done, active.length, stuck.length)}
+      />
 
       <div className="mt-4 grid grid-cols-2 gap-3">
-        <StatTile value={done} label="Done today" color="text-success" />
-        <StatTile value={active.length} label="On your plate" color="text-accent" />
+        <StatTile value={done} label="Done today" />
+        <StatTile value={active.length} label="On your plate" />
       </div>
 
       <input
@@ -58,7 +61,7 @@ export default function Home() {
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && submit()}
         placeholder="Add a task — just brain-dump it"
-        className="mt-4 w-full rounded-2xl border border-ink-border bg-ink-card px-4 py-3.5 text-[15px] text-on-ink outline-none placeholder:text-on-ink-faint focus:border-accent"
+        className="mt-4 w-full rounded-control border border-line bg-paper px-4 py-3.5 text-[15px] text-ink outline-none placeholder:text-ink-soft/70 focus:border-orange"
       />
 
       {stuck.length > 0 && (
@@ -67,9 +70,9 @@ export default function Home() {
           <div className="mt-3 space-y-3">
             <AnimatePresence initial={false}>
               {stuck.map((t) => (
-                <div key={`stuck-${t.id}`} className="rounded-2xl bg-warning/10 p-1">
-                  <div className="flex items-center gap-1.5 px-3 pt-2 text-[11px] text-warning">
-                    <Sparkles size={13} /> You've been putting this off — tap to break it down
+                <div key={`stuck-${t.id}`} className="rounded-card bg-orange/15 p-1.5">
+                  <div className="label-mono flex items-center gap-1.5 px-3 pt-1.5 pb-1 text-[10px] font-semibold text-amber">
+                    <Sparkles size={12} /> Putting this off — tap to break it down
                   </div>
                   <TaskRow task={t} onToggle={() => toggleComplete(t.id)} onClick={() => navigate(`/task/${t.id}`)} />
                 </div>
@@ -83,11 +86,11 @@ export default function Home() {
         <SectionHeader title="Your tasks" trailing={`${active.length} open`} />
         <div className="mt-3 space-y-3">
           {active.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-2xl bg-ink-card p-5">
-              <CheckCheck className="text-success" />
+            <div className="flex items-center gap-3 rounded-card bg-espresso p-5 shadow-bento">
+              <CheckCheck className="text-orange" />
               <div>
-                <p className="font-medium text-on-ink">All clear</p>
-                <p className="text-sm text-on-ink-muted">Nothing open right now. Add the next thing when you’re ready.</p>
+                <p className="font-medium text-sand">All clear</p>
+                <p className="text-sm text-sand-soft">Nothing open right now. Add the next thing when you’re ready.</p>
               </div>
             </div>
           ) : (
@@ -103,11 +106,11 @@ export default function Home() {
   )
 }
 
-function StatTile({ value, label, color }: { value: number; label: string; color: string }) {
+function StatTile({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-2xl bg-ink-card p-4">
-      <p className={`text-3xl font-semibold ${color}`}>{value}</p>
-      <p className="text-sm text-on-ink-muted">{label}</p>
+    <div className="rounded-card bg-espresso p-5 shadow-bento">
+      <p className="text-4xl font-medium tracking-tight text-orange">{value}</p>
+      <p className="label-mono mt-1 text-[10px] font-semibold text-sand-soft">{label}</p>
     </div>
   )
 }
@@ -115,8 +118,8 @@ function StatTile({ value, label, color }: { value: number; label: string; color
 function SectionHeader({ title, trailing }: { title: string; trailing?: string }) {
   return (
     <div className="flex items-center justify-between">
-      <h2 className="text-[11px] font-medium uppercase tracking-wider text-on-ink-muted">{title}</h2>
-      {trailing && <span className="text-[11px] text-on-ink-faint">{trailing}</span>}
+      <h2 className="label-mono text-[11px] font-semibold text-ink-soft">{title}</h2>
+      {trailing && <span className="label-mono text-[11px] font-semibold text-ink-soft/70">{trailing}</span>}
     </div>
   )
 }

@@ -20,62 +20,83 @@ export interface SlotSuggestion {
   task: Task | null
 }
 
+/** When you're willing to work: a daily window and which weekdays count. */
+export interface Availability {
+  startHour: number // 0–23, inclusive
+  endHour: number // 1–24, exclusive
+  weekdays: number[] // 0=Sun … 6=Sat
+}
+
+export const DEFAULT_AVAILABILITY: Availability = {
+  startHour: 9,
+  endHour: 21,
+  weekdays: [0, 1, 2, 3, 4, 5, 6],
+}
+
 export const slotMinutes = (slot: FreeSlot) => Math.round((slot.end - slot.start) / 60000)
 
-function atHour(hour: number, minute = 0): number {
-  const d = new Date()
-  d.setHours(hour, minute, 0, 0)
-  // If that time already passed today, roll the whole sample day to tomorrow.
-  if (d.getTime() < Date.now() - 12 * 3600_000) {
-    d.setDate(d.getDate() + 1)
-  }
+const DAY = 24 * 60 * 60 * 1000
+
+function startOfDay(ms: number): number {
+  const d = new Date(ms)
+  d.setHours(0, 0, 0, 0)
   return d.getTime()
 }
 
-/** A representative day spread across the two connected calendars. */
-export function sampleDay(): CalendarEvent[] {
-  return [
-    { title: 'Standup', start: atHour(9), end: atHour(9, 15), source: 'WORK' },
-    { title: 'Design review', start: atHour(10, 30), end: atHour(11, 30), source: 'WORK' },
-    { title: 'Lunch', start: atHour(12, 30), end: atHour(13), source: 'PERSONAL' },
-    { title: '1:1 with manager', start: atHour(14), end: atHour(14, 30), source: 'WORK' },
-    { title: 'School pickup', start: atHour(16, 30), end: atHour(17), source: 'PERSONAL' },
-  ]
-}
-
-interface BusyInterval {
-  start: number
-  end: number
+function atHourOn(dayStart: number, hour: number): number {
+  return dayStart + hour * 60 * 60 * 1000
 }
 
 /**
- * Turn a list of busy intervals into the open gaps within waking hours. Shared
- * by the demo provider and the real Google Calendar provider — the only thing
- * that differs between them is where the busy intervals come from.
+ * Open gaps across the next `horizonDays`, clipped to the user's availability
+ * window each day, with busy intervals subtracted. Shared by the demo and the
+ * real Google provider — only the busy list differs.
  */
-export function computeFreeSlots(busy: BusyInterval[], wakeHour = 8, sleepHour = 20): FreeSlot[] {
-  const dayStart = Math.max(Date.now(), atHour(wakeHour))
-  const dayEnd = atHour(sleepHour)
-  if (dayEnd <= dayStart) return []
-
-  const sorted = busy
-    .filter((e) => e.end > dayStart && e.start < dayEnd)
-    .sort((a, b) => a.start - b.start)
-
+export function freeSlotsInWindow(
+  busy: { start: number; end: number }[],
+  availability: Availability,
+  horizonDays = 7,
+  now = Date.now(),
+): FreeSlot[] {
   const slots: FreeSlot[] = []
-  let cursor = dayStart
-  for (const e of sorted) {
-    if (e.start > cursor) slots.push({ start: cursor, end: e.start })
-    cursor = Math.max(cursor, e.end)
+  const today = startOfDay(now)
+
+  for (let d = 0; d < horizonDays; d++) {
+    const dayStart0 = today + d * DAY
+    const weekday = new Date(dayStart0).getDay()
+    if (!availability.weekdays.includes(weekday)) continue
+
+    let windowStart = atHourOn(dayStart0, availability.startHour)
+    const windowEnd = atHourOn(dayStart0, availability.endHour)
+    if (d === 0) windowStart = Math.max(windowStart, now)
+    if (windowEnd <= windowStart) continue
+
+    const dayBusy = busy
+      .filter((e) => e.end > windowStart && e.start < windowEnd)
+      .sort((a, b) => a.start - b.start)
+
+    let cursor = windowStart
+    for (const e of dayBusy) {
+      if (e.start > cursor) slots.push({ start: cursor, end: e.start })
+      cursor = Math.max(cursor, e.end)
+    }
+    if (cursor < windowEnd) slots.push({ start: cursor, end: windowEnd })
   }
-  if (cursor < dayEnd) slots.push({ start: cursor, end: dayEnd })
 
   return slots.filter((s) => slotMinutes(s) >= 15)
 }
 
-/** Demo free slots, derived from the sample day. */
-export function freeSlots(): FreeSlot[] {
-  return computeFreeSlots(sampleDay())
+/** A representative day of demo events (today), spread across the two calendars. */
+export function sampleDay(now = Date.now()): CalendarEvent[] {
+  const today = startOfDay(now)
+  const at = (h: number, m = 0) => atHourOn(today, h) + m * 60000
+  return [
+    { title: 'Standup', start: at(9), end: at(9, 15), source: 'WORK' },
+    { title: 'Design review', start: at(10, 30), end: at(11, 30), source: 'WORK' },
+    { title: 'Lunch', start: at(12, 30), end: at(13), source: 'PERSONAL' },
+    { title: '1:1 with manager', start: at(14), end: at(14, 30), source: 'WORK' },
+    { title: 'School pickup', start: at(16, 30), end: at(17), source: 'PERSONAL' },
+  ]
 }
 
 /** Energy people typically have through the day — used as a soft preference. */

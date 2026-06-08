@@ -4,42 +4,45 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#07080b',
-        'ink-elevated': '#111318',
-        'ink-card': '#15171d',
-        'ink-border': '#24272f',
-        'on-ink': '#f4f6fa',
-        'on-ink-muted': '#9aa1ad',
-        'on-ink-faint': '#606673',
-        accent: '#2f6bff',
-        'accent-bright': '#5c8dff',
-        'accent-deep': '#0a1430',
-        success: '#3ddc97',
-        warning: '#ffb454',
-        danger: '#ff6b6b',
+        // Canvas + light surfaces
+        cream: '#E4E2DD',
+        paper: '#FFFFFF',
+        // Dark "bento" surfaces
+        espresso: '#2C1D11',
+        'espresso-2': '#3A2818',
+        // Brand
+        orange: '#F97316',
+        amber: '#D97706',
+        // Text on light canvas
+        ink: '#111827',
+        'ink-soft': '#4B5563',
+        line: '#E5E7EB',
+        // Text on dark surfaces
+        sand: '#EDE7DF',
+        'sand-soft': '#A99E8E',
+        // Feedback
+        danger: '#DC2626',
       },
       fontFamily: {
-        sans: [
-          'Inter',
-          'system-ui',
-          '-apple-system',
-          'Segoe UI',
-          'Roboto',
-          'sans-serif',
-        ],
+        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: {
-        '2xl': '1.25rem',
-        '3xl': '1.75rem',
+        card: '32px',
+        control: '24px',
+      },
+      boxShadow: {
+        bento: '0 18px 40px -24px rgba(44, 29, 17, 0.45)',
+        lift: '0 10px 30px -12px rgba(44, 29, 17, 0.35)',
       },
       keyframes: {
-        'pop-in': {
-          '0%': { transform: 'scale(0.6)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
+        'rise-in': {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
         },
       },
       animation: {
-        'pop-in': 'pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'rise-in': 'rise-in 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
       },
     },
   },
