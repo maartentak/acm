@@ -14,10 +14,11 @@ export default {
         danger: '#D7263D', // the single reserved accent (errors/destructive)
       },
       fontFamily: {
+        // Body/UI text — clean and legible.
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        serif: ['Newsreader', 'Georgia', 'Times New Roman', 'serif'],
+        // Headings + numerals — distinctive, Nothing-OS-adjacent grotesk.
+        display: ['"Space Grotesk"', 'Inter', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
-        dot: ['"DotGothic16"', '"JetBrains Mono"', 'monospace'],
       },
       borderRadius: {
         card: '28px',

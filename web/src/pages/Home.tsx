@@ -69,12 +69,12 @@ export default function Home() {
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && submit()}
         placeholder="Add a task — just brain-dump it"
-        className="mt-5 w-full rounded-control border border-line bg-card px-4 py-3.5 text-[15px] text-ink shadow-soft outline-none placeholder:text-ink-faint focus:border-ink"
+        className="mt-6 w-full rounded-control border border-line bg-card px-4 py-4 text-[15px] text-ink shadow-soft outline-none placeholder:text-ink-faint focus:border-ink"
       />
 
       <SegTabs tabs={tabs} active={tab} onChange={setTab} />
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-5 space-y-3">
         {list.length === 0 ? (
           <EmptyState tab={tab} />
         ) : (
@@ -95,16 +95,18 @@ function WeekStrip() {
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i))
   const wd = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   return (
-    <div className="mt-5 flex items-stretch justify-between gap-1.5 rounded-card border border-line bg-card p-2 shadow-soft">
+    <div className="mt-6 flex items-stretch justify-between gap-1.5 rounded-card border border-line bg-card p-2.5 shadow-soft">
       {days.map((d, i) => {
         const on = isSameDay(d, today)
         return (
           <div
             key={i}
-            className={`flex flex-1 flex-col items-center gap-1 rounded-[16px] py-2 ${on ? 'bg-fill' : ''}`}
+            className={`flex flex-1 flex-col items-center gap-1.5 rounded-[18px] py-2.5 ${on ? 'bg-fill' : ''}`}
           >
             <span className={`label-mono text-[9px] font-semibold ${on ? 'text-ink-soft' : 'text-ink-faint'}`}>{wd[i]}</span>
-            <span className={`font-dot text-[18px] leading-none ${on ? 'text-ink' : 'text-ink-faint'}`}>{d.getDate()}</span>
+            <span className={`tnum font-display text-[18px] font-medium leading-none ${on ? 'text-ink' : 'text-ink-faint'}`}>
+              {d.getDate()}
+            </span>
           </div>
         )
       })}
@@ -114,19 +116,19 @@ function WeekStrip() {
 
 function SegTabs({ tabs, active, onChange }: { tabs: { id: Tab; label: string; count: number }[]; active: Tab; onChange: (t: Tab) => void }) {
   return (
-    <div className="mt-6 flex gap-1 rounded-full border border-line bg-card p-1 shadow-soft">
+    <div className="mt-7 flex gap-1 rounded-full border border-line bg-card p-1 shadow-soft">
       {tabs.map((t) => {
         const on = active === t.id
         return (
           <button
             key={t.id}
             onClick={() => onChange(t.id)}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-2.5 text-[13px] font-medium transition-colors ${
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-3 text-[13px] font-medium transition-colors ${
               on ? 'bg-ink text-white' : 'text-ink-soft'
             }`}
           >
             {t.label}
-            <span className={`font-mono text-[10px] ${on ? 'text-white/70' : 'text-ink-faint'}`}>{t.count}</span>
+            <span className={`tnum font-mono text-[10px] ${on ? 'text-white/70' : 'text-ink-faint'}`}>{t.count}</span>
           </button>
         )
       })}

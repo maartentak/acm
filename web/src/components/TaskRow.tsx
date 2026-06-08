@@ -21,7 +21,7 @@ export default function TaskRow({ task, onToggle, onClick }: Props) {
       exit={{ opacity: 0, scale: 0.96 }}
       whileTap={{ scale: 0.99 }}
       onClick={onClick}
-      className="flex cursor-pointer items-center gap-3.5 rounded-card border border-line bg-card p-4 shadow-soft"
+      className="flex cursor-pointer items-center gap-4 rounded-card border border-line bg-card p-[18px] shadow-soft"
     >
       <CompletionCheck checked={task.status === 'DONE'} onToggle={onToggle} />
       <div className="min-w-0 flex-1">
@@ -32,7 +32,7 @@ export default function TaskRow({ task, onToggle, onClick }: Props) {
         >
           {task.title}
         </p>
-        <div className="label-mono mt-1.5 flex flex-wrap items-center gap-3 text-[10px] font-semibold">
+        <div className="label-mono mt-2 flex flex-wrap items-center gap-3 text-[10px] font-semibold">
           {stuck && (
             <span className="flex items-center gap-1 text-ink">
               <Sparkles size={12} /> Stuck

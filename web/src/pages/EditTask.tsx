@@ -59,7 +59,7 @@ export default function EditTask() {
       className="px-5 pb-12 pt-6 safe-top"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium tracking-tight text-ink">{existing ? 'Edit task' : 'New task'}</h1>
+        <h1 className="font-display text-[26px] font-semibold tracking-tight text-ink">{existing ? 'Edit task' : 'New task'}</h1>
         <button
           onClick={() => navigate(-1)}
           aria-label="Close"

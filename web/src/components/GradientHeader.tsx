@@ -13,7 +13,7 @@ export default function GradientHeader({ eyebrow, title, subline }: Props) {
   return (
     <div>
       {eyebrow && <p className="label-mono text-[11px] font-semibold text-ink-faint">{eyebrow}</p>}
-      <h1 className="mt-1 text-[28px] font-semibold leading-tight tracking-tight text-ink">{title}</h1>
+      <h1 className="mt-1.5 font-display text-[30px] font-semibold leading-[1.1] tracking-tight text-ink">{title}</h1>
       {subline !== undefined && (
         <AnimatePresence mode="wait">
           <motion.p
@@ -22,7 +22,7 @@ export default function GradientHeader({ eyebrow, title, subline }: Props) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.3 }}
-            className="accent-serif mt-1 text-[22px] leading-snug text-ink-soft"
+            className="mt-2 text-[17px] leading-relaxed text-ink-soft"
           >
             {subline}
           </motion.p>

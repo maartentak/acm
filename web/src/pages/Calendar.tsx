@@ -305,7 +305,7 @@ function SlotCard({
       className="rounded-card border border-line bg-card p-4 shadow-soft"
     >
       <div className="flex items-baseline gap-2">
-        <span className="font-dot text-[15px] text-ink">{slotRange(slot)}</span>
+        <span className="tnum font-display text-[16px] font-medium text-ink">{slotRange(slot)}</span>
         <span className="label-mono text-[10px] font-semibold text-ink-faint">{slotMinutes(slot)} min free</span>
       </div>
 
@@ -361,7 +361,7 @@ function AvailabilityCard({
             <button
               key={i}
               onClick={() => toggleDay(i)}
-              className={`h-9 w-9 rounded-full text-[13px] font-medium transition-colors ${
+              className={`h-10 w-10 rounded-full text-[13px] font-medium transition-colors ${
                 on ? 'bg-ink text-white' : 'bg-fill text-ink-faint'
               }`}
             >
@@ -379,7 +379,7 @@ function HourSelect({ value, options, onChange }: { value: number; options: numb
     <select
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="rounded-control bg-fill px-3 py-2 font-dot text-[15px] text-ink outline-none"
+      className="tnum rounded-control bg-fill px-3 py-2.5 font-display text-[15px] text-ink outline-none"
     >
       {options.map((h) => (
         <option key={h} value={h} className="font-sans text-ink">

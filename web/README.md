@@ -15,9 +15,11 @@ Two ideas most task apps miss:
    waiting task actually fits, matched to the energy you tend to have then.
 
 Clean, understated, monochrome UI (Nothing-OS inspired: light-grey canvas, white
-cards with hairline borders, black pill controls, serif-italic accent line, mono
-+ dot-matrix numerals) with smooth Framer Motion animations and satisfying,
-haptic task completion.
+cards with hairline borders, black pill controls) typeset in **Space Grotesk**
+(display + numerals) + **Inter** (body) + **JetBrains Mono** (labels), with a
+generous 4/8 spacing rhythm, smooth Framer Motion animations, and satisfying,
+haptic task completion. Type and spacing were tuned with the bundled
+[`ui-ux-pro-max`](../.claude/skills/ui-ux-pro-max) design-intelligence skill.
 
 ## Run it
 

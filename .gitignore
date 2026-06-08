@@ -10,3 +10,5 @@
 local.properties
 *.keystore
 !debug.keystore
+
+.claude/skills/**/__pycache__/

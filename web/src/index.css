@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&family=DotGothic16&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -45,9 +45,8 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
-  /* Serif italic accent line. */
-  .accent-serif {
-    font-family: 'Newsreader', Georgia, serif;
-    font-style: italic;
+  /* Tabular figures for numerals so data doesn't jitter. */
+  .tnum {
+    font-feature-settings: 'tnum' 1;
   }
 }

@@ -68,7 +68,7 @@ export default function TaskDetail() {
       </div>
 
       <h1
-        className={`mt-5 text-[28px] font-semibold leading-tight tracking-tight ${
+        className={`mt-5 font-display text-[30px] font-semibold leading-[1.1] tracking-tight ${
           task.status === 'DONE' ? 'text-ink-faint line-through' : 'text-ink'
         }`}
       >
